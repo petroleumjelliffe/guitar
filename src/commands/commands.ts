@@ -39,6 +39,7 @@ export function createCommands(ctx: CommandContext) {
   }
 
   function setLesson(lesson: Lesson) {
+    saveNow();
     store.lesson.value = lesson;
     store.activeSectionId.value = null;
     store.selectedSectionId.value = null;

@@ -93,6 +93,14 @@ describe('updateLesson', () => {
     expect(library.get(ID)?.gap).toBe(1);
     expect(hashes.at(-1)).toBe(`#v=1&id=${ID}&g=1`);
   });
+  test('flushes a pending save before switching lessons', () => {
+    commands.openLesson(ID);
+    commands.updateLesson({ ...store.lesson.value!, gap: 1 });
+    commands.openLesson('bbbbbbbbbbb');
+    expect(library.get(ID)?.gap).toBe(1);
+    vi.advanceTimersByTime(300);
+    expect(library.get('bbbbbbbbbbb')).toBeUndefined();
+  });
 });
 
 describe('attachPlayer / detachPlayer', () => {
