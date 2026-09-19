@@ -1,5 +1,8 @@
 import type { Library } from '../lesson/library';
-import { createLesson, type Lesson } from '../lesson/model';
+import {
+  createLesson, newId, nudge as nudgeSection, removeSection, roundTime, snapRate, upsertSection,
+  type Lesson, type Section,
+} from '../lesson/model';
 import { decodeLesson, encodeLesson } from '../lesson/url';
 import { parseVideoId } from '../lesson/youtubeUrl';
 import { LoopEngine, TICK_MS } from '../loop/engine';
@@ -32,6 +35,13 @@ export function createCommands(ctx: CommandContext) {
   let tickHandle: ReturnType<typeof setInterval> | null = null;
   let unsubscribe: (() => void) | null = null;
   let saveHandle: ReturnType<typeof setTimeout> | null = null;
+  let lastDeleted: Section | null = null;
+
+  const sections = () => store.lesson.value?.sections ?? [];
+  const activeSection = () => sections().find((s) => s.id === store.activeSectionId.value) ?? null;
+  const selectedOrActive = () =>
+    sections().find((s) => s.id === store.selectedSectionId.value) ?? activeSection();
+  const activeIndex = () => sections().findIndex((s) => s.id === store.activeSectionId.value);
 
   function refreshLibrary() {
     store.library.value = library.list();
@@ -184,6 +194,156 @@ export function createCommands(ctx: CommandContext) {
     shareUrl(): string {
       const l = store.lesson.value;
       return l ? ctx.baseUrl + encodeLesson(l) : ctx.baseUrl;
+    },
+
+    togglePlay() {
+      if (!session) return;
+      session.player.state() === 'playing' ? session.player.pause() : session.player.play();
+    },
+
+    jumpToSectionId(id: string) {
+      const s = sections().find((x) => x.id === id);
+      if (!s || !session) return;
+      store.selectedSectionId.value = id;
+      session.engine.activate(s);
+    },
+
+    jumpToSection(n: number) {
+      const s = sections()[n - 1];
+      if (s) commands.jumpToSectionId(s.id);
+    },
+
+    restartSection() {
+      if (activeSection()) session?.engine.restart();
+      else commands.jumpToSection(1);
+    },
+
+    nextSection() {
+      const list = sections();
+      if (!list.length) return;
+      const i = activeIndex();
+      commands.jumpToSectionId(list[(i + 1) % list.length]!.id);
+    },
+
+    prevSection() {
+      const list = sections();
+      if (!list.length) return;
+      const i = activeIndex();
+      commands.jumpToSectionId(list[(i - 1 + list.length) % list.length]!.id);
+    },
+
+    toggleLoop() {
+      session?.engine.toggleLoop();
+    },
+
+    seekTo(seconds: number) {
+      session?.engine.seekTo(seconds);
+    },
+
+    seekBy(delta: number) {
+      session?.engine.seekBy(delta);
+    },
+
+    stepFrame(dir: -1 | 1) {
+      session?.engine.stepFrame(dir);
+    },
+
+    setRate(rate: number) {
+      if (!session) return;
+      const snapped = snapRate(rate, session.player.availableRates());
+      session.player.setRate(snapped);
+      store.rate.value = snapped;
+      const l = store.lesson.value;
+      const active = activeSection();
+      if (l && active && active.rate !== snapped) {
+        updateLesson(upsertSection(l, { ...active, rate: snapped }, ctx.now()));
+      }
+    },
+
+    rateStep(dir: -1 | 1) {
+      if (!session) return;
+      const rates = session.player.availableRates();
+      const i = rates.indexOf(snapRate(session.player.rate(), rates));
+      const next = rates[Math.max(0, Math.min(rates.length - 1, i + dir))];
+      if (next !== undefined) commands.setRate(next);
+    },
+
+    markStart() {
+      if (!session) return;
+      store.pendingStart.value = roundTime(session.player.currentTime());
+    },
+
+    markEnd() {
+      const l = store.lesson.value;
+      if (!l || !session) return;
+      const end = roundTime(session.player.currentTime());
+      const pending = store.pendingStart.value;
+      if (pending !== null) {
+        const section: Section = {
+          id: newId(), name: `Section ${l.sections.length + 1}`, start: pending, end, rate: session.player.rate(),
+        };
+        updateLesson(upsertSection(l, section, ctx.now()));
+        store.pendingStart.value = null;
+        commands.jumpToSectionId(section.id);
+        return;
+      }
+      const active = activeSection();
+      if (active) updateLesson(upsertSection(l, { ...active, end }, ctx.now()));
+    },
+
+    nudge(edge: 'start' | 'end', delta: number) {
+      const l = store.lesson.value;
+      const target = selectedOrActive();
+      if (!l || !target) return;
+      const moved = nudgeSection(target, edge, delta);
+      if (moved) updateLesson(upsertSection(l, moved, ctx.now()));
+    },
+
+    setGap(seconds: number) {
+      const l = store.lesson.value;
+      if (l) updateLesson({ ...l, gap: seconds, updatedAt: ctx.now() });
+    },
+
+    cycleGap() {
+      const g = store.lesson.value?.gap ?? 0;
+      commands.setGap((g + 1) % 4);
+    },
+
+    toggleMirror() { store.mirror.value = !store.mirror.value; },
+    toggleRotate() { store.rotate.value = !store.rotate.value; },
+
+    selectSection(id: string | null) {
+      store.selectedSectionId.value = id;
+    },
+
+    renameSection(id: string, name: string) {
+      const l = store.lesson.value;
+      const s = sections().find((x) => x.id === id);
+      if (l && s) updateLesson(upsertSection(l, { ...s, name }, ctx.now()));
+    },
+
+    deleteSection(id = store.selectedSectionId.value ?? store.activeSectionId.value) {
+      const l = store.lesson.value;
+      const s = id && sections().find((x) => x.id === id);
+      if (!l || !s) return;
+      lastDeleted = s;
+      if (store.activeSectionId.value === s.id) session?.engine.deactivate();
+      if (store.selectedSectionId.value === s.id) store.selectedSectionId.value = null;
+      updateLesson(removeSection(l, s.id, ctx.now()));
+      store.notice.value = { text: `Deleted "${s.name}"`, action: { label: 'Undo', run: commands.undoDelete } };
+    },
+
+    undoDelete() {
+      const l = store.lesson.value;
+      if (!l || !lastDeleted) return;
+      updateLesson(upsertSection(l, lastDeleted, ctx.now()));
+      store.selectedSectionId.value = lastDeleted.id;
+      lastDeleted = null;
+      store.notice.value = null;
+    },
+
+    dismissNotice() {
+      store.notice.value = null;
     },
   };
 
