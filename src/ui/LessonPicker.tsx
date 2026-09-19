@@ -13,7 +13,13 @@ export function LessonPicker() {
         }}
       >
         <input
-          type="url"
+          type="text"
+          id="lesson-url"
+          name="url"
+          inputMode="url"
+          autoComplete="off"
+          spellcheck={false}
+          aria-label="YouTube link or video ID"
           placeholder="Paste a YouTube link"
           value={input}
           onInput={(e) => setInput((e.target as HTMLInputElement).value)}
