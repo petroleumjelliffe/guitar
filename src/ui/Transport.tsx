@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import { commands, store } from '../app';
 import { formatTime } from '../lesson/model';
 
@@ -6,6 +6,12 @@ export function Transport() {
   const lesson = store.lesson.value!;
   const playing = store.playerState.value === 'playing';
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(false), 1500);
+    return () => clearTimeout(t);
+  }, [copied]);
 
   return (
     <div class="transport">
@@ -41,10 +47,9 @@ export function Transport() {
         <button class={store.rotate.value ? 'active' : ''} onClick={() => commands.toggleRotate()} title="R">Rotate</button>
         <button
           onClick={() => {
-            navigator.clipboard.writeText(commands.shareUrl()).then(() => {
-              setCopied(true);
-              setTimeout(() => setCopied(false), 1500);
-            });
+            const url = commands.shareUrl();
+            const copy = navigator.clipboard?.writeText(url) ?? Promise.reject(new Error('no clipboard'));
+            copy.then(() => setCopied(true)).catch(() => window.prompt('Copy this link', url));
           }}
         >
           {copied ? 'Copied' : 'Share link'}
