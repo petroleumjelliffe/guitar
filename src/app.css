@@ -37,3 +37,36 @@ input { background: var(--panel); color: var(--fg); border: 1px solid #333; bord
 .notice { background: var(--panel); border-left: 4px solid var(--accent); padding: 10px 12px; border-radius: 6px; margin-bottom: 8px; }
 .notice-error { border-left-color: var(--danger); }
 .notice button { min-height: 0; padding: 6px 10px; margin-left: 8px; }
+
+.timeline { position: relative; height: 28px; margin: 10px 0; background: var(--panel); border-radius: 6px; cursor: pointer; }
+.timeline-section { position: absolute; top: 6px; bottom: 6px; opacity: 0.55; border-radius: 4px; }
+.timeline-section.active { opacity: 1; outline: 2px solid #fff; }
+.timeline-playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; pointer-events: none; }
+.timeline-pending { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); pointer-events: none; }
+
+.lesson-body { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 900px) { .lesson-body { grid-template-columns: 1fr 1fr; } }
+
+.transport-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+.transport .big { min-width: 72px; font-size: 1.3em; }
+.label { color: var(--muted); min-width: 56px; }
+.spacer { flex: 1; }
+.time { font-variant-numeric: tabular-nums; color: var(--muted); }
+
+.sections-mark { display: flex; gap: 8px; margin-bottom: 8px; }
+.sections-mark button { flex: 1; }
+.hint { color: var(--muted); }
+kbd { background: var(--panel); border: 1px solid #444; border-radius: 4px; padding: 1px 6px; }
+.section-list { list-style: none; padding: 0; margin: 0; }
+.section-row { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+.section-row.active .section-jump { border-color: var(--accent); }
+.section-row.selected .section-jump { background: #2a2a2e; }
+.section-jump { flex: 1; display: grid; grid-template-columns: 28px 1fr auto auto; gap: 10px; text-align: left; align-items: center; }
+.section-num { color: var(--muted); }
+.section-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.section-range, .section-rate { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.editor { background: var(--panel); border-radius: var(--radius); padding: 12px; margin-top: 12px; display: grid; gap: 8px; }
+.editor input { width: 100%; }
+.editor-row { display: flex; align-items: center; gap: 8px; }
+button.danger { color: var(--danger); }
