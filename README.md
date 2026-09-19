@@ -12,7 +12,8 @@ page-turner pedal can send the same keys.
 
 ## Features (v1)
 
-- Named, loopable sections with a per-section speed
+- Named, loopable sections with a per-section speed (0.25×–2×, in
+  0.05× steps between 0.75× and 1×)
 - Optional pause between loop repeats so you can reset your hand
 - ±0.1 s nudging of section start and end
 - Frame stepping while paused (`,` / `.`) to watch fingering closely
@@ -20,6 +21,25 @@ page-turner pedal can send the same keys.
   your view of your own
 - Library saved in the browser, plus a shareable link per lesson that
   carries its sections
+
+## Hotkeys
+
+| Key | Action |
+|---|---|
+| `Space` | Play / pause |
+| `Enter`, `PageUp`, `↑` | Restart section (pedal left) |
+| `PageDown`, `↓` | Next section (pedal right) |
+| `L` | Toggle loop |
+| `1`–`9` | Jump to section |
+| `←` / `→` | Seek −3 s / +3 s |
+| `Shift+←/→` | Nudge section start ∓0.1 s |
+| `Alt+←/→` | Nudge section end ∓0.1 s |
+| `,` / `.` | Step one frame (paused) |
+| `-` / `=` | Speed down / up |
+| `[` / `]` | Mark start / mark end |
+| `G` | Cycle gap 0 → 1 → 2 → 3 s |
+| `M` / `R` | Mirror / rotate 180° |
+| `Delete` | Delete selected section (undo offered) |
 
 ## Non-goals (v1)
 
