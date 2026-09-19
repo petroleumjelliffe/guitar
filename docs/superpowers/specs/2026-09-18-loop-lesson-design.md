@@ -269,14 +269,49 @@ this section once run.
 
 1. **Intermediate rates**: does `setPlaybackRate(0.85)` take effect
    in the embed? If yes, offer 0.05 steps between 0.5 and 1.0.
+
+   **Result:** asked 0.85, got 0.85; asked 0.9, got 0.9 — intermediate
+   rates are honored by the embed (`getAvailablePlaybackRates()` still
+   only lists the fixed steps, but `setPlaybackRate` accepts and
+   applies arbitrary values) → `DEFAULT_RATES` gains 0.8, 0.85, 0.9,
+   0.95 and `rateStep` steps through them.
 2. **Frame step feel**: latency and spinner behaviour of paused
    `seekTo(t ± 1/30, true)`. Usable, or drop to "seek ±0.25 s"?
+
+   **Result:** 5 consecutive `step +1/30` clicks while paused: each
+   landed ~250ms after the call (250, 251, 251, 251, 250ms — latency
+   is dominated by the spike's own 250ms measurement delay, not an
+   observed player stall), and each advanced `currentTime` by ~0.033s
+   as expected (8.936 → 8.969 → 9.002 → 9.036 → 9.069). No `state 3`
+   (buffering) events fired between steps, so no spinner while paused
+   → FRAME stays 1/30; latency is well under the ~400ms threshold.
 3. **Loop overshoot**: measured overshoot at 50 ms polling; does
    `seekTo(start, true)` glitch audio?
+
+   **Result:** five laps at playback rate 0.9 (set by spike 1 just
+   before running this): overshoot 0.042s, 0.005s, 0.008s, 0.013s,
+   0.017s — all comfortably under the 100–200ms budgeted in
+   CLAUDE.md's known constraints (note: measured at 0.9x rate, so
+   overshoot at 1x could run somewhat higher). Each seek showed a
+   clean `state 3` (buffering) → `state 1` (playing) transition with
+   no error states; audio glitch itself isn't observable through the
+   automated tooling used here, no anomaly seen in state events →
+   keep the 50ms poll interval and the documented 100–200ms overshoot
+   budget as-is.
 4. **Overlay + focus**: with `controls=0` and the overlay, do hotkeys
    keep working after clicking the video?
+
+   **Result:** clicked the overlay, then pressed `a`; log recorded
+   `keydown a (hotkeys alive)` — the overlay keeps the iframe from
+   stealing keyboard focus → keep the overlay in the real UI as
+   planned, no design change needed.
 5. **Title**: does `getVideoData().title` return reliably after
    `onReady`?
+
+   **Result:** `title="Rick Astley - Never Gonna Give You Up
+   (Official Video) (4K Remaster)"` — a real title, not `undefined`
+   → `getVideoData().title` is safe to use as-is wherever the plan
+   needs a display title.
 
 ## 12. Out of scope (v1)
 

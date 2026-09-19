@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Spikes</title>
+<style>
+  body { font-family: system-ui; background: #111; color: #eee; padding: 16px; }
+  #wrap { position: relative; width: 640px; height: 360px; }
+  #overlay { position: absolute; inset: 0; }
+  button { font-size: 16px; margin: 4px; padding: 8px 12px; }
+  pre { background: #000; padding: 8px; height: 240px; overflow: auto; }
+</style>
+</head>
+<body>
+<h1>Player spikes</h1>
+<p>Click the video, then press keys. Log shows whether keydown still reaches the page.</p>
+<div id="wrap"><div id="player"></div><div id="overlay"></div></div>
+<div>
+  <button data-rate="0.85">rate 0.85</button>
+  <button data-rate="0.9">rate 0.9</button>
+  <button data-rate="0.75">rate 0.75</button>
+  <button data-rate="1">rate 1</button>
+  <button id="step-back">step −1/30</button>
+  <button id="step-fwd">step +1/30</button>
+  <button id="loop">loop 10s–12s ×5, measure overshoot</button>
+  <button id="title">title</button>
+</div>
+<pre id="log"></pre>
+<script>
+  const log = (m) => { document.getElementById('log').textContent += m + '\n'; };
+  const tag = document.createElement('script'); tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+  let p;
+  window.onYouTubeIframeAPIReady = () => {
+    p = new YT.Player('player', {
+      videoId: 'dQw4w9WgXcQ',
+      playerVars: { controls: 0, disablekb: 1, rel: 0, playsinline: 1, modestbranding: 1 },
+      events: {
+        onReady: () => log('ready; rates=' + JSON.stringify(p.getAvailablePlaybackRates())),
+        onStateChange: (e) => log('state ' + e.data),
+      },
+    });
+  };
+  document.getElementById('overlay').onclick = () => {
+    p.getPlayerState() === 1 ? p.pauseVideo() : p.playVideo();
+  };
+  window.addEventListener('keydown', (e) => log('keydown ' + e.key + ' (hotkeys alive)'));
+  document.querySelectorAll('[data-rate]').forEach((b) => b.onclick = () => {
+    p.setPlaybackRate(Number(b.dataset.rate));
+    setTimeout(() => log(`asked ${b.dataset.rate}, got ${p.getPlaybackRate()}`), 300);
+  });
+  const step = (dir) => {
+    p.pauseVideo();
+    const t0 = performance.now();
+    p.seekTo(p.getCurrentTime() + dir / 30, true);
+    setTimeout(() => log(`step ${dir}: now ${p.getCurrentTime().toFixed(3)} (${(performance.now() - t0).toFixed(0)}ms)`), 250);
+  };
+  document.getElementById('step-back').onclick = () => step(-1);
+  document.getElementById('step-fwd').onclick = () => step(1);
+  document.getElementById('loop').onclick = () => {
+    let laps = 0;
+    p.seekTo(10, true); p.playVideo();
+    const id = setInterval(() => {
+      const t = p.getCurrentTime();
+      if (t >= 12) {
+        log(`lap ${++laps}: overshoot ${(t - 12).toFixed(3)}s`);
+        p.seekTo(10, true);
+        if (laps >= 5) clearInterval(id);
+      }
+    }, 50);
+  };
+  document.getElementById('title').onclick = () => log('title=' + JSON.stringify(p.getVideoData && p.getVideoData().title));
+</script>
+</body>
+</html>
