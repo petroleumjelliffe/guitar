@@ -229,7 +229,8 @@ export function createCommands(ctx: CommandContext) {
       const list = sections();
       if (!list.length) return;
       const i = activeIndex();
-      commands.jumpToSectionId(list[(i - 1 + list.length) % list.length]!.id);
+      const prevIndex = i < 0 ? list.length - 1 : (i - 1 + list.length) % list.length;
+      commands.jumpToSectionId(list[prevIndex]!.id);
     },
 
     toggleLoop() {

@@ -210,6 +210,11 @@ describe('playback commands', () => {
     commands.prevSection();
     expect(store.activeSectionId.value).toBe('b');
   });
+  test('prevSection with nothing active goes to the last section', () => {
+    openWithPlayer([['A', 10, 20], ['B', 30, 40]]);
+    commands.prevSection();
+    expect(store.activeSectionId.value).toBe('b');
+  });
   test('toggleLoop reflects in the store', () => {
     openWithPlayer();
     commands.toggleLoop();
@@ -233,7 +238,7 @@ describe('rate commands', () => {
   test('setRate snaps and persists on the active section', () => {
     openWithPlayer([['A', 10, 20]]);
     commands.jumpToSection(1);
-    commands.setRate(0.8);
+    commands.setRate(0.82);
     expect(player.r).toBe(0.8);
     expect(store.lesson.value?.sections[0]?.rate).toBe(0.8);
   });
