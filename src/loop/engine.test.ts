@@ -116,3 +116,99 @@ describe('setSection / deactivate', () => {
     expect(engine.state.looping).toBe(true);
   });
 });
+
+describe('tick with gap', () => {
+  test('pauses, seeks to start, then resumes after the gap', () => {
+    engine.gap = 2;
+    engine.activate(section);
+    engine.toggleLoop();
+    player.time = 20.2;
+    player.calls = [];
+
+    engine.tick();
+    expect(player.calls).toEqual(['pause', 'seek:10']);
+    expect(engine.state.gapUntil).toBe(3_000);
+
+    clock = 2_500;
+    engine.tick();
+    expect(player.calls).toEqual(['pause', 'seek:10']); // still waiting
+
+    clock = 3_000;
+    engine.tick();
+    expect(player.calls).toEqual(['pause', 'seek:10', 'play']);
+    expect(engine.state.gapUntil).toBeNull();
+  });
+  test('restart during the gap clears it and plays', () => {
+    engine.gap = 2;
+    engine.activate(section);
+    engine.toggleLoop();
+    player.time = 20.2;
+    engine.tick();
+    player.calls = [];
+    engine.restart();
+    expect(player.calls).toEqual(['seek:10', 'play']);
+    expect(engine.state.gapUntil).toBeNull();
+  });
+  test('toggling loop off during the gap clears it', () => {
+    engine.gap = 2;
+    engine.activate(section);
+    engine.toggleLoop();
+    player.time = 20.2;
+    engine.tick();
+    engine.toggleLoop();
+    expect(engine.state.gapUntil).toBeNull();
+  });
+});
+
+describe('seekTo / seekBy', () => {
+  test('clamps to [0, duration]', () => {
+    engine.seekTo(-5);
+    engine.seekTo(999);
+    expect(player.calls).toEqual(['seek:0', 'seek:300']);
+  });
+  test('keeps the section when landing near it', () => {
+    engine.activate(section);
+    engine.seekTo(9.6);
+    engine.seekTo(20.9);
+    expect(engine.state.section).not.toBeNull();
+  });
+  test('deactivates when landing outside [start-0.5, end+1]', () => {
+    engine.activate(section);
+    engine.seekTo(9.4);
+    expect(engine.state.section).toBeNull();
+    engine.activate(section);
+    engine.seekTo(21.1);
+    expect(engine.state.section).toBeNull();
+  });
+  test('seekBy is relative to the current time', () => {
+    player.time = 50;
+    engine.seekBy(-3);
+    expect(player.time).toBe(47);
+  });
+});
+
+describe('stepFrame', () => {
+  test('moves one frame while paused', () => {
+    player.time = 10;
+    engine.stepFrame(1);
+    expect(player.time).toBeCloseTo(10 + 1 / 30, 6);
+    engine.stepFrame(-1);
+    engine.stepFrame(-1);
+    expect(player.time).toBeCloseTo(10 - 1 / 30, 6);
+  });
+  test('does nothing while playing', () => {
+    player.play();
+    player.time = 10;
+    player.calls = [];
+    engine.stepFrame(1);
+    expect(player.calls).toEqual([]);
+  });
+  test('clamps at 0 and duration', () => {
+    player.time = 0;
+    engine.stepFrame(-1);
+    expect(player.time).toBe(0);
+    player.time = 300;
+    engine.stepFrame(1);
+    expect(player.time).toBe(300);
+  });
+});

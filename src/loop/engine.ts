@@ -2,7 +2,7 @@ import type { Section } from '../lesson/model';
 import type { PlayerPort } from '../player/port';
 
 export const TICK_MS = 50;
-export const FRAME = 1 / 30; // Task 2 may change this to 0.25
+export const FRAME = 1 / 30; // one frame at 30 fps; verified usable in the player spikes
 
 export interface LoopState {
   section: Section | null;
@@ -54,6 +54,28 @@ export class LoopEngine {
   toggleLoop(): boolean {
     this.set({ looping: !this.state.looping, gapUntil: null });
     return this.state.looping;
+  }
+
+  private clamp(t: number): number {
+    return Math.max(0, Math.min(this.player.duration(), t));
+  }
+
+  /** A user-initiated seek. Leaving the active section's neighbourhood deactivates it. */
+  seekTo(seconds: number): void {
+    const t = this.clamp(seconds);
+    this.player.seek(t);
+    const s = this.state.section;
+    if (s && (t < s.start - 0.5 || t > s.end + 1)) this.deactivate();
+  }
+
+  seekBy(delta: number): void {
+    this.seekTo(this.player.currentTime() + delta);
+  }
+
+  /** Simulated frame step: only while paused. */
+  stepFrame(dir: -1 | 1): void {
+    if (this.player.state() !== 'paused') return;
+    this.player.seek(this.clamp(this.player.currentTime() + dir * FRAME));
   }
 
   tick(): void {
