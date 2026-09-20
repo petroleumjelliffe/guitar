@@ -36,6 +36,10 @@ export function createCommands(ctx: CommandContext) {
   let unsubscribe: (() => void) | null = null;
   let saveHandle: ReturnType<typeof setTimeout> | null = null;
   let lastDeleted: Section | null = null;
+  // The library copy a share link differed from, kept so `restoreSaved` can
+  // bring it back even though `attachPlayer` no longer persists over it.
+  // Cleared on the first real edit (`updateLesson`) or on leaving the lesson.
+  let savedSnapshot: Lesson | null = null;
 
   const sections = () => store.lesson.value?.sections ?? [];
   const activeSection = () => sections().find((s) => s.id === store.activeSectionId.value) ?? null;
@@ -64,6 +68,10 @@ export function createCommands(ctx: CommandContext) {
   function saveNow() {
     if (saveHandle) clearTimeout(saveHandle);
     saveHandle = null;
+    // While a share link's un-edited view is on screen (`linkDiffers`), the
+    // displayed lesson is not yet a committed edit — never let a flush (e.g.
+    // from switching lessons or closing) persist it over the saved copy.
+    if (store.linkDiffers.value) return;
     const l = store.lesson.value;
     if (l) library.save(l);
     store.storageWarning.value = library.unavailable;
@@ -71,14 +79,27 @@ export function createCommands(ctx: CommandContext) {
 
   function updateLesson(next: Lesson) {
     store.lesson.value = next;
-    ctx.setHash(encodeLesson(next));
+    // The first real edit after opening a share link commits it: the saved
+    // copy is legitimately superseded now, so the "differs" notice must go.
+    store.linkDiffers.value = false;
+    savedSnapshot = null;
     if (session) {
       session.engine.gap = next.gap;
       const active = next.sections.find((s) => s.id === store.activeSectionId.value);
       if (active) session.engine.setSection(active);
     }
     if (saveHandle) clearTimeout(saveHandle);
-    saveHandle = setTimeout(saveNow, SAVE_DEBOUNCE_MS);
+    // Debounce the hash write alongside the save: writing history.replaceState
+    // on every keystroke can hit Safari's rate limit, and doing it before the
+    // save was scheduled meant a SecurityError there could skip the save too.
+    saveHandle = setTimeout(() => {
+      saveNow();
+      try {
+        ctx.setHash(encodeLesson(next));
+      } catch {
+        // Rate-limited by the browser; the next edit's debounce will retry.
+      }
+    }, SAVE_DEBOUNCE_MS);
   }
 
   function syncFromEngine() {
@@ -116,6 +137,7 @@ export function createCommands(ctx: CommandContext) {
     openLesson(videoId: string) {
       setLesson(library.get(videoId) ?? createLesson(videoId, videoId, ctx.now()));
       store.linkDiffers.value = false;
+      savedSnapshot = null;
     },
 
     openFromHash(hash: string): boolean {
@@ -128,16 +150,19 @@ export function createCommands(ctx: CommandContext) {
       const saved = library.get(r.lesson.videoId);
       const lesson = saved ? { ...r.lesson, title: saved.title } : r.lesson;
       setLesson(lesson);
-      store.linkDiffers.value = !!saved && encodeLesson(saved) !== encodeLesson(r.lesson);
+      const differs = !!saved && encodeLesson(saved) !== encodeLesson(r.lesson);
+      store.linkDiffers.value = differs;
+      savedSnapshot = differs ? saved! : null;
       return true;
     },
 
     restoreSaved() {
       const l = store.lesson.value;
-      const saved = l && library.get(l.videoId);
+      const saved = savedSnapshot ?? (l ? library.get(l.videoId) : undefined);
       if (!saved) return;
       setLesson(saved);
       store.linkDiffers.value = false;
+      savedSnapshot = null;
     },
 
     closeLesson() {
@@ -150,6 +175,7 @@ export function createCommands(ctx: CommandContext) {
       store.looping.value = false;
       store.inGap.value = false;
       store.linkDiffers.value = false;
+      savedSnapshot = null;
       store.notice.value = null;
       store.error.value = null;
       store.currentTime.value = 0;
@@ -165,8 +191,16 @@ export function createCommands(ctx: CommandContext) {
       const lesson = store.lesson.value;
       if (lesson) {
         engine.gap = lesson.gap;
-        if (title && title !== lesson.title) updateLesson({ ...lesson, title, updatedAt: ctx.now() });
-        else saveNow();
+        if (store.linkDiffers.value) {
+          // Still showing an un-committed share link: apply the player's
+          // title in memory only. Persisting here is exactly the bug that
+          // overwrote the saved lesson as soon as the player was ready.
+          if (title && title !== lesson.title) store.lesson.value = { ...lesson, title };
+        } else if (title && title !== lesson.title) {
+          updateLesson({ ...lesson, title, updatedAt: ctx.now() });
+        } else {
+          saveNow();
+        }
       }
       engine.onChange = syncFromEngine;
       store.availableRates.value = player.availableRates();
@@ -176,6 +210,9 @@ export function createCommands(ctx: CommandContext) {
         engine.tick();
         syncFromPlayer();
       }, TICK_MS);
+      // Reflect the fresh engine's state (e.g. looping resets to false)
+      // instead of leaving the store showing the previous session's values.
+      syncFromEngine();
     },
 
     detachPlayer() {

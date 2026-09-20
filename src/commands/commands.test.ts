@@ -80,15 +80,36 @@ describe('openFromHash', () => {
     expect(store.lesson.value?.gap).toBe(3);
     expect(store.linkDiffers.value).toBe(false);
   });
+  test('attaching a player does not overwrite the saved copy; restoreSaved still works', () => {
+    library.save(upsertSection(createLesson(ID, 'Saved'), { id: 'a', name: 'A', start: 0, end: 5, rate: 1 }));
+    commands.openFromHash(`#v=1&id=${ID}&g=2`);
+    commands.attachPlayer(player, 'Real title');
+    vi.advanceTimersByTime(300);
+    expect(library.get(ID)?.sections).toHaveLength(1);
+    commands.restoreSaved();
+    expect(store.lesson.value?.sections).toHaveLength(1);
+    expect(store.linkDiffers.value).toBe(false);
+  });
+  test('the first edit after a link load overwrites the saved copy and clears the notice', () => {
+    library.save({ ...createLesson(ID, 'Saved'), gap: 3 });
+    commands.openFromHash(`#v=1&id=${ID}&g=2`);
+    commands.updateLesson({ ...store.lesson.value!, gap: 1 });
+    vi.advanceTimersByTime(300);
+    expect(library.get(ID)?.gap).toBe(1);
+    expect(store.linkDiffers.value).toBe(false);
+  });
 });
 
 describe('updateLesson', () => {
   test('debounces the library save by 300 ms and updates the hash', () => {
     commands.openLesson(ID);
+    const hashesBefore = hashes.length;
     commands.updateLesson({ ...store.lesson.value!, gap: 1 });
     expect(library.get(ID)).toBeUndefined();
+    expect(hashes.length).toBe(hashesBefore); // hash not written before the timer fires
     vi.advanceTimersByTime(299);
     expect(library.get(ID)).toBeUndefined();
+    expect(hashes.length).toBe(hashesBefore);
     vi.advanceTimersByTime(1);
     expect(library.get(ID)?.gap).toBe(1);
     expect(hashes.at(-1)).toBe(`#v=1&id=${ID}&g=1`);
@@ -127,6 +148,15 @@ describe('attachPlayer / detachPlayer', () => {
     commands.openLesson(ID);
     commands.attachPlayer(player, '');
     expect(commands.session()?.engine.gap).toBe(2);
+  });
+  test('re-attaching a player syncs the store from the fresh engine (loop resets)', () => {
+    library.save({ ...createLesson(ID), gap: 2 });
+    commands.openLesson(ID);
+    commands.attachPlayer(player, '');
+    commands.toggleLoop();
+    expect(store.looping.value).toBe(true);
+    commands.attachPlayer(new FakePlayer(), '');
+    expect(store.looping.value).toBe(false);
   });
   test('keeps the existing title when the player has none', () => {
     library.save(createLesson(ID, 'Saved'));

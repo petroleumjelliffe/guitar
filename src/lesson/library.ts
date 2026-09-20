@@ -32,7 +32,9 @@ export class Library {
       const raw = storage.getItem(LIBRARY_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as LibraryData;
-        if (parsed && parsed.v === 1 && parsed.lessons) this.data = parsed;
+        const lessons: unknown = parsed?.lessons;
+        const hasLessonsMap = typeof lessons === 'object' && lessons !== null && !Array.isArray(lessons);
+        if (parsed && parsed.v === 1 && hasLessonsMap) this.data = parsed;
       }
     } catch {
       // Corrupt or unreadable: start empty. Writing will still be attempted.
@@ -55,6 +57,7 @@ export class Library {
 
   list(): LessonSummary[] {
     return Object.values(this.data.lessons)
+      .filter((l): l is Lesson => !!l && typeof l.videoId === 'string' && Array.isArray(l.sections))
       .map((l) => ({ videoId: l.videoId, title: l.title, sectionCount: l.sections.length, updatedAt: l.updatedAt }))
       .sort((a, b) => b.updatedAt - a.updatedAt);
   }

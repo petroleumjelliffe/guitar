@@ -74,7 +74,13 @@ export class YouTubePlayer implements PlayerPort {
   seek(seconds: number) { this.yt.seekTo(seconds, true); }
   play() { this.yt.playVideo(); }
   pause() { this.yt.pauseVideo(); }
-  state() { return this.lastState; }
+  // Query the player synchronously so one missed onStateChange event doesn't
+  // leave the loop engine believing the video is stuck; fall back to the
+  // last known event when the API can't report a current code.
+  state() {
+    const code = this.yt.getPlayerState?.();
+    return (code !== undefined && STATES[code]) || this.lastState;
+  }
   setRate(rate: number) { this.yt.setPlaybackRate(rate); }
   rate() { return this.yt.getPlaybackRate?.() ?? 1; }
   // The embed honours setPlaybackRate at intermediate rates (e.g. 0.85), but

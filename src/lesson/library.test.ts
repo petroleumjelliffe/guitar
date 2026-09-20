@@ -46,6 +46,18 @@ describe('Library', () => {
     expect(new Library(storage).list()).toEqual([]);
   });
 
+  test('a non-object lessons value is ignored; list stays empty', () => {
+    const storage = new MemStorage();
+    storage.setItem(LIBRARY_KEY, JSON.stringify({ v: 1, lessons: 'oops' }));
+    expect(new Library(storage).list()).toEqual([]);
+  });
+
+  test('malformed lesson entries are skipped without throwing', () => {
+    const storage = new MemStorage();
+    storage.setItem(LIBRARY_KEY, JSON.stringify({ v: 1, lessons: { x: { videoId: 'x' } } }));
+    expect(new Library(storage).list()).toEqual([]);
+  });
+
   test('null storage works in memory and reports unavailable', () => {
     const lib = new Library(null);
     lib.save(createLesson('dQw4w9WgXcQ'));
