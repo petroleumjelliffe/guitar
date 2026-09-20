@@ -27,8 +27,8 @@ must stay browser-free so they can be unit-tested with fakes.
   without it, the iframe steals keyboard focus and hotkeys die.
 - Mirror/rotate is view-only state. Never persist it or put it in the
   share URL.
-- The share URL must stay backward compatible once shipped; version
-  the format.
+- Alpha: share-URL and storage formats may change freely (no migrations)
+  until the user declares a release; keep the `v` field anyway.
 
 ## Known constraints
 
