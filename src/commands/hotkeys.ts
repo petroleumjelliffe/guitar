@@ -31,8 +31,8 @@ const PLAIN: Record<string, [CommandName, ...unknown[]]> = {
   '[': ['markStart'],
   ']': ['markEnd'],
   g: ['cycleGap'],
-  m: ['toggleMirror'],
-  r: ['toggleRotate'],
+  m: ['toggleFlip', 'mirror'],
+  r: ['toggleFlip', 'rotate'],
   Delete: ['deleteSection'],
   Backspace: ['deleteSection'],
 };

@@ -361,13 +361,21 @@ describe('marking and editing', () => {
     commands.cycleGap();
     expect(store.lesson.value?.gap).toBe(0);
   });
-  test('mirror and rotate toggle without touching the lesson', () => {
+  test('flip modes are exclusive and never touch the lesson', () => {
     openWithPlayer();
     const before = store.lesson.value;
-    commands.toggleMirror();
-    commands.toggleRotate();
-    expect(store.mirror.value).toBe(true);
-    expect(store.rotate.value).toBe(true);
+    expect(store.flip.value).toBe('normal');
+    commands.toggleFlip('mirror');
+    expect(store.flip.value).toBe('mirror');
+    commands.toggleFlip('rotate');
+    expect(store.flip.value).toBe('rotate');
+    commands.toggleFlip('rotate');
+    expect(store.flip.value).toBe('normal');
+    commands.setFlip('mirror');
+    commands.setFlip('mirror');
+    expect(store.flip.value).toBe('mirror');
+    commands.setFlip('normal');
+    expect(store.flip.value).toBe('normal');
     expect(store.lesson.value).toBe(before);
   });
 });

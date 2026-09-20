@@ -19,7 +19,7 @@ guitar via hotkeys or a page-turner pedal.
 | Marker model | Named sections that loop. Sections are also the custom chapters. |
 | Persistence | Browser storage library + shareable URL that carries the sections. |
 | v1 aids | Hotkeys/pedal, gap between repeats, ±0.1 s nudge. Not a speed trainer. |
-| Mirror / rotate | View-only toggles (`M`, `R`). Never saved, never in the URL. |
+| Mirror / rotate | One view mode: normal / mirror / rotate (exclusive). `M` and `R` toggle their mode against normal. View-only; never saved, never in the URL. |
 | Frame step | Simulated by seeking ±1/30 s while paused. |
 | Stack | Vite + TypeScript + Preact. Vitest for unit tests. |
 
@@ -202,7 +202,7 @@ in a text input.
 | `Shift+ArrowLeft/Right` | nudge active section start ∓0.1 s |
 | `Alt+ArrowLeft/Right` | nudge active section end ∓0.1 s |
 | `G` | cycle gap 0 → 1 → 2 → 3 → 0 |
-| `M` / `R` | toggleMirror / toggleRotate |
+| `M` / `R` | toggleFlip('mirror') / toggleFlip('rotate') |
 | `Delete` | deleteSection (with undo toast) |
 
 Pedal note: cheap Bluetooth page turners send `PageUp/PageDown` or

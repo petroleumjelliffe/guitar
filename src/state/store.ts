@@ -3,6 +3,9 @@ import { DEFAULT_RATES, type Lesson } from '../lesson/model';
 import type { LessonSummary } from '../lesson/library';
 import type { PlayerState } from '../player/port';
 
+/** How the video is shown: view-only, never saved. */
+export type FlipMode = 'normal' | 'mirror' | 'rotate';
+
 export interface Notice {
   text: string;
   action?: { label: string; run: () => void };
@@ -20,8 +23,7 @@ export interface Store {
   duration: Signal<number>;
   rate: Signal<number>;
   availableRates: Signal<number[]>;
-  mirror: Signal<boolean>;
-  rotate: Signal<boolean>;
+  flip: Signal<FlipMode>;
   library: Signal<LessonSummary[]>;
   linkDiffers: Signal<boolean>;
   inputError: Signal<string | null>;
@@ -43,8 +45,7 @@ export function createStore(): Store {
     duration: signal(0),
     rate: signal(1),
     availableRates: signal([...DEFAULT_RATES]),
-    mirror: signal(false),
-    rotate: signal(false),
+    flip: signal('normal'),
     library: signal([]),
     linkDiffers: signal(false),
     inputError: signal(null),

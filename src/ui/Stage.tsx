@@ -33,9 +33,7 @@ export function Stage({ videoId }: { videoId: string }) {
     };
   }, [videoId]);
 
-  const transform = [store.mirror.value ? 'scaleX(-1)' : '', store.rotate.value ? 'rotate(180deg)' : '']
-    .join(' ')
-    .trim();
+  const transform = { normal: '', mirror: 'scaleX(-1)', rotate: 'rotate(180deg)' }[store.flip.value];
 
   return (
     <div class="stage">

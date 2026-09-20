@@ -7,7 +7,7 @@ import { decodeLesson, encodeLesson } from '../lesson/url';
 import { parseVideoId } from '../lesson/youtubeUrl';
 import { LoopEngine, TICK_MS } from '../loop/engine';
 import type { PlayerPort } from '../player/port';
-import type { Store } from '../state/store';
+import type { FlipMode, Store } from '../state/store';
 
 export interface CommandContext {
   store: Store;
@@ -356,8 +356,9 @@ export function createCommands(ctx: CommandContext) {
       commands.setGap((g + 1) % 4);
     },
 
-    toggleMirror() { store.mirror.value = !store.mirror.value; },
-    toggleRotate() { store.rotate.value = !store.rotate.value; },
+    setFlip(mode: FlipMode) { store.flip.value = mode; },
+    /** Hotkey behaviour: the mode's key toggles it against normal; any other mode switches to it. */
+    toggleFlip(mode: FlipMode) { store.flip.value = store.flip.value === mode ? 'normal' : mode; },
 
     selectSection(id: string | null) {
       store.selectedSectionId.value = id;

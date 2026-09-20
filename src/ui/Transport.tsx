@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'preact/hooks';
 import { commands, store } from '../app';
 import { formatTime } from '../lesson/model';
+import type { FlipMode } from '../state/store';
+
+const FLIPS: Array<[FlipMode, string, string]> = [['normal', 'Normal', ''], ['mirror', 'Mirror', 'M'], ['rotate', 'Rotate', 'R']];
 
 export function Transport() {
   const lesson = store.lesson.value!;
@@ -43,8 +46,12 @@ export function Transport() {
         <span class="spacer" />
         <button onClick={() => commands.stepFrame(-1)} title=",">◀ frame</button>
         <button onClick={() => commands.stepFrame(1)} title=".">frame ▶</button>
-        <button class={store.mirror.value ? 'active' : ''} onClick={() => commands.toggleMirror()} title="M">Mirror</button>
-        <button class={store.rotate.value ? 'active' : ''} onClick={() => commands.toggleRotate()} title="R">Rotate</button>
+        <span class="label">View</span>
+        {FLIPS.map(([mode, label, key]) => (
+          <button key={mode} class={mode === store.flip.value ? 'active' : ''} onClick={() => commands.setFlip(mode)} title={key}>
+            {label}
+          </button>
+        ))}
         <button
           onClick={() => {
             const url = commands.shareUrl();
