@@ -65,3 +65,8 @@ Static site: no backend, no login. Deployable to any static host.
 
 - `docs/superpowers/specs/` — design specs
 - `docs/superpowers/plans/` — implementation plans
+
+## Deploying
+
+Pushes to `main` build and deploy to GitHub Pages via `.github/workflows/pages.yml`.
+One-time setup: repo Settings → Pages → Source: **GitHub Actions**.
