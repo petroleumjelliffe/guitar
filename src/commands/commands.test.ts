@@ -184,9 +184,16 @@ describe('shareUrl / playerError', () => {
     commands.openLesson(ID);
     expect(commands.shareUrl()).toBe(`https://x.test/#v=1&id=${ID}`);
   });
-  test('playerError sets a message', () => {
-    commands.playerError(150);
-    expect(store.error.value).toMatch(/can't be played here/);
+  test.each([
+    [101, /embedding.*\(error 101\)/],
+    [150, /embedding.*\(error 150\)/],
+    [100, /not found.*\(error 100\)/],
+    [2, /invalid.*\(error 2\)/i],
+    [5, /player error.*\(error 5\)/],
+    [999, /can't be played here.*\(error 999\)/],
+  ])('playerError(%i) sets a code-specific message', (code, pattern) => {
+    commands.playerError(code);
+    expect(store.error.value).toMatch(pattern);
   });
 });
 

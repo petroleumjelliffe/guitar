@@ -24,9 +24,18 @@ export interface Session {
 
 const SAVE_DEBOUNCE_MS = 300;
 
+// Codes from the IFrame Player API's onError event.
+const PLAYER_ERRORS: Record<number, string> = {
+  2: 'Invalid video ID.',
+  5: 'YouTube reported a player error.',
+  100: 'Video not found — it may be private or removed.',
+  101: "The video's owner has disabled embedding, so it can't play here.",
+  150: "The video's owner has disabled embedding, so it can't play here.",
+};
+
 export function playerErrorMessage(code: number): string {
-  void code; // every documented code (2, 5, 100, 101, 150) gets the same message
-  return "This video can't be played here — open it on YouTube.";
+  const reason = PLAYER_ERRORS[code] ?? "This video can't be played here.";
+  return `${reason} (error ${code}) — open it on YouTube instead.`;
 }
 
 export function createCommands(ctx: CommandContext) {
