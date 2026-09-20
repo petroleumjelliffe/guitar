@@ -185,8 +185,8 @@ describe('shareUrl / playerError', () => {
     expect(commands.shareUrl()).toBe(`https://x.test/#v=1&id=${ID}`);
   });
   test.each([
-    [101, /embedding.*\(error 101\)/],
-    [150, /embedding.*\(error 150\)/],
+    [101, /embedding.*signed in.*\(error 101\)/],
+    [150, /embedding.*signed in.*\(error 150\)/],
     [100, /not found.*\(error 100\)/],
     [2, /invalid.*\(error 2\)/i],
     [5, /player error.*\(error 5\)/],
