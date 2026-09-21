@@ -84,8 +84,9 @@ function bpmFromTaps(state: TapState): number | null;
   Keeps at most 8 taps.
 - `bpmFromTaps` returns `null` with fewer than 4 taps (3 intervals);
   otherwise `round(60000 / meanInterval)`, clamped to `[30, 300]`.
-- Callers pass *song time*: `wallClockMs / rate`, so tapping along at
-  0.75× yields the video's true BPM.
+- Callers pass *song time*: `wallClockMs × rate`. At 0.75× the song
+  advances 0.75 s per wall second, so wall intervals shrink by the rate
+  and the result is the video's true BPM.
 
 ## 5. Clicker port and Web Audio implementation
 
