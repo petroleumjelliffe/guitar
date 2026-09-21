@@ -33,30 +33,37 @@ export class WebAudioClicker implements ClickerPort {
   countIn(bpm: number, beats: number, beatsPerBar: number, startAtMs: number): void {
     const ctx = this.context();
     if (!ctx || bpm <= 0 || beats <= 0) return;
-    if (ctx.state === 'suspended') void ctx.resume().catch(() => undefined);
-    this.stop();
+    // Wrap the entire audio operation: the engine calls this from its tick;
+    // audio must never throw into it. If something fails mid-schedule, stop()
+    // cancels any partial schedule and prevents half-configured oscillators.
+    try {
+      if (ctx.state === 'suspended') void ctx.resume().catch(() => undefined);
+      this.stop();
 
-    // Map the engine clock onto the audio clock once per call.
-    const audioStart = ctx.currentTime + Math.max(0, (startAtMs - this.now()) / 1000);
-    const interval = 60 / bpm;
+      // Map the engine clock onto the audio clock once per call.
+      const audioStart = ctx.currentTime + Math.max(0, (startAtMs - this.now()) / 1000);
+      const interval = 60 / bpm;
 
-    for (let i = 0; i < beats; i++) {
-      const t = audioStart + i * interval;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = i % beatsPerBar === 0 ? ACCENT_HZ : CLICK_HZ;
-      gain.gain.setValueAtTime(0.5, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + CLICK_SECONDS);
-      osc.connect(gain).connect(ctx.destination);
-      osc.onended = () => {
-        this.pending = this.pending.filter((o) => o !== osc);
-        osc.disconnect();
-        gain.disconnect();
-      };
-      osc.start(t);
-      osc.stop(t + CLICK_SECONDS + 0.005);
-      this.pending.push(osc);
+      for (let i = 0; i < beats; i++) {
+        const t = audioStart + i * interval;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = i % beatsPerBar === 0 ? ACCENT_HZ : CLICK_HZ;
+        gain.gain.setValueAtTime(0.5, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + CLICK_SECONDS);
+        osc.connect(gain).connect(ctx.destination);
+        osc.onended = () => {
+          this.pending = this.pending.filter((o) => o !== osc);
+          osc.disconnect();
+          gain.disconnect();
+        };
+        osc.start(t);
+        osc.stop(t + CLICK_SECONDS + 0.005);
+        this.pending.push(osc);
+      }
+    } catch {
+      this.stop();
     }
   }
 
