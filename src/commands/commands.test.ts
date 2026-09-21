@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { FakeClicker } from '../audio/fake';
 import { Library, type StorageLike } from '../lesson/library';
 import { createLesson, upsertSection } from '../lesson/model';
 import { encodeLesson } from '../lesson/url';
@@ -19,14 +20,19 @@ let library: Library;
 let hashes: string[];
 let commands: Commands;
 let player: FakePlayer;
+let clicker: FakeClicker;
+let clock: number;
 
 beforeEach(() => {
   vi.useFakeTimers();
   store = createStore();
   library = new Library(new MemStorage());
   hashes = [];
+  clock = 1_000;
+  clicker = new FakeClicker();
   commands = createCommands({
-    store, library, setHash: (h) => hashes.push(h), baseUrl: 'https://x.test/', now: () => 1_000,
+    store, library, setHash: (h) => hashes.push(h), baseUrl: 'https://x.test/', now: () => clock,
+    createClicker: () => clicker,
   });
   player = new FakePlayer();
 });
@@ -377,5 +383,105 @@ describe('marking and editing', () => {
     commands.setFlip('normal');
     expect(store.flip.value).toBe('normal');
     expect(store.lesson.value).toBe(before);
+  });
+});
+
+describe('tempo commands', () => {
+  test('attachPlayer gives the engine the clicker and the lesson count-in; detach stops clicks', () => {
+    library.save({ ...createLesson(ID), countIn: 2 });
+    commands.openLesson(ID);
+    commands.attachPlayer(player, '');
+    expect(commands.session()?.engine.clicker).toBe(clicker);
+    expect(commands.session()?.engine.countIn).toBe(2);
+    commands.detachPlayer();
+    expect(clicker.calls).toEqual(['stop']);
+  });
+
+  test('setCountIn persists and reaches the engine', () => {
+    openWithPlayer();
+    commands.setCountIn(0);
+    expect(store.lesson.value?.countIn).toBe(0);
+    expect(commands.session()?.engine.countIn).toBe(0);
+  });
+
+  test('tapTempo needs a section', () => {
+    openWithPlayer();
+    commands.tapTempo();
+    expect(store.notice.value?.text).toMatch(/select a section/i);
+  });
+
+  test('tapTempo converges after four taps and persists the bpm on the section', () => {
+    openWithPlayer([['A', 10, 20]]);
+    commands.jumpToSection(1);
+    for (const t of [0, 500, 1000]) {
+      clock = 10_000 + t;
+      commands.tapTempo();
+    }
+    expect(store.notice.value?.text).toBe('♩ tap ×3');
+    expect(store.lesson.value?.sections[0]?.bpm).toBe(0);
+    clock = 11_500;
+    commands.tapTempo();
+    expect(store.notice.value?.text).toBe('♩ 120');
+    expect(store.lesson.value?.sections[0]?.bpm).toBe(120);
+  });
+
+  test('tapTempo scales wall time by the playback rate', () => {
+    openWithPlayer([['A', 10, 20, 0.5]]);
+    commands.jumpToSection(1); // applies rate 0.5
+    for (const t of [0, 1000, 2000, 3000]) {
+      clock = 10_000 + t;
+      commands.tapTempo();
+    }
+    // 1000 ms apart at 0.5× is 500 ms of song time → 120 BPM
+    expect(store.lesson.value?.sections[0]?.bpm).toBe(120);
+  });
+
+  test('tapTempo targets the selected section and resets taps when the target changes', () => {
+    openWithPlayer([['A', 10, 20], ['B', 30, 40]]);
+    commands.selectSection('a');
+    for (const t of [0, 500, 1000]) {
+      clock = 10_000 + t;
+      commands.tapTempo();
+    }
+    commands.selectSection('b');
+    clock = 11_500;
+    commands.tapTempo();
+    expect(store.notice.value?.text).toBe('♩ tap ×1');
+    expect(store.lesson.value?.sections.map((s) => s.bpm)).toEqual([0, 0]);
+  });
+
+  test('setBpm normalises; nudgeBpm steps and ignores untapped sections', () => {
+    openWithPlayer([['A', 10, 20]]);
+    commands.selectSection('a');
+    commands.nudgeBpm(1);
+    expect(store.lesson.value?.sections[0]?.bpm).toBe(0);
+    commands.setBpm(119.6);
+    expect(store.lesson.value?.sections[0]?.bpm).toBe(120);
+    commands.nudgeBpm(-1);
+    expect(store.lesson.value?.sections[0]?.bpm).toBe(119);
+    commands.setBpm(5000);
+    expect(store.lesson.value?.sections[0]?.bpm).toBe(300);
+  });
+
+  test('setBeatsPerBar persists', () => {
+    openWithPlayer([['A', 10, 20]]);
+    commands.selectSection('a');
+    commands.setBeatsPerBar(3);
+    expect(store.lesson.value?.sections[0]?.beatsPerBar).toBe(3);
+  });
+
+  test('closeLesson resets tap history', () => {
+    openWithPlayer([['A', 10, 20]]);
+    commands.jumpToSection(1);
+    for (const t of [0, 500, 1000]) {
+      clock = 10_000 + t;
+      commands.tapTempo();
+    }
+    commands.closeLesson();
+    openWithPlayer([['A', 10, 20]]);
+    commands.jumpToSection(1);
+    clock = 11_500;
+    commands.tapTempo();
+    expect(store.notice.value?.text).toBe('♩ tap ×1');
   });
 });

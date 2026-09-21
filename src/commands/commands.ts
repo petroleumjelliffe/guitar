@@ -1,8 +1,10 @@
+import type { ClickerPort } from '../audio/port';
 import type { Library } from '../lesson/library';
 import {
-  createLesson, createSection, nudge as nudgeSection, removeSection, roundTime, snapRate, upsertSection,
-  type Lesson, type Section,
+  createLesson, createSection, normalizeBpm, nudge as nudgeSection, removeSection, roundTime, snapRate,
+  upsertSection, type BeatsPerBar, type CountIn, type Lesson, type Section,
 } from '../lesson/model';
+import { bpmFromTaps, emptyTaps, tap, type TapState } from '../lesson/tempo';
 import { decodeLesson, encodeLesson } from '../lesson/url';
 import { parseVideoId } from '../lesson/youtubeUrl';
 import { LoopEngine, TICK_MS } from '../loop/engine';
@@ -15,6 +17,7 @@ export interface CommandContext {
   setHash(hash: string): void;
   baseUrl: string; // origin + pathname, ends with '/'
   now(): number;
+  createClicker(): ClickerPort;
 }
 
 export interface Session {
@@ -49,6 +52,8 @@ export function createCommands(ctx: CommandContext) {
   // bring it back even though `attachPlayer` no longer persists over it.
   // Cleared on the first real edit (`updateLesson`) or on leaving the lesson.
   let savedSnapshot: Lesson | null = null;
+  let taps: TapState = emptyTaps();
+  let tapTarget: string | null = null;
 
   const sections = () => store.lesson.value?.sections ?? [];
   const activeSection = () => sections().find((s) => s.id === store.activeSectionId.value) ?? null;
@@ -70,7 +75,10 @@ export function createCommands(ctx: CommandContext) {
     store.error.value = null;
     store.inputError.value = null;
     session?.engine.deactivate();
-    if (session) session.engine.gap = lesson.gap;
+    if (session) {
+      session.engine.gap = lesson.gap;
+      session.engine.countIn = lesson.countIn;
+    }
     ctx.setHash(encodeLesson(lesson));
   }
 
@@ -94,6 +102,7 @@ export function createCommands(ctx: CommandContext) {
     savedSnapshot = null;
     if (session) {
       session.engine.gap = next.gap;
+      session.engine.countIn = next.countIn;
       const active = next.sections.find((s) => s.id === store.activeSectionId.value);
       if (active) session.engine.setSection(active);
     }
@@ -185,6 +194,8 @@ export function createCommands(ctx: CommandContext) {
       store.inGap.value = false;
       store.linkDiffers.value = false;
       savedSnapshot = null;
+      taps = emptyTaps();
+      tapTarget = null;
       store.notice.value = null;
       store.error.value = null;
       store.currentTime.value = 0;
@@ -196,10 +207,12 @@ export function createCommands(ctx: CommandContext) {
     attachPlayer(player: PlayerPort, title: string) {
       commands.detachPlayer();
       const engine = new LoopEngine(player, ctx.now);
+      engine.clicker = ctx.createClicker();
       session = { player, engine };
       const lesson = store.lesson.value;
       if (lesson) {
         engine.gap = lesson.gap;
+        engine.countIn = lesson.countIn;
         if (store.linkDiffers.value) {
           // Still showing an un-committed share link: apply the player's
           // title in memory only. Persisting here is exactly the bug that
@@ -225,6 +238,7 @@ export function createCommands(ctx: CommandContext) {
     },
 
     detachPlayer() {
+      session?.engine.clicker?.stop();
       if (tickHandle) clearInterval(tickHandle);
       tickHandle = null;
       unsubscribe?.();
@@ -354,6 +368,52 @@ export function createCommands(ctx: CommandContext) {
     cycleGap() {
       const g = store.lesson.value?.gap ?? 0;
       commands.setGap((g + 1) % 4);
+    },
+
+    setCountIn(bars: CountIn) {
+      const l = store.lesson.value;
+      if (l) updateLesson({ ...l, countIn: bars, updatedAt: ctx.now() });
+    },
+
+    tapTempo() {
+      const l = store.lesson.value;
+      const target = selectedOrActive();
+      if (!l || !target || !session) {
+        store.notice.value = { text: 'Select a section first' };
+        return;
+      }
+      if (tapTarget !== target.id) {
+        taps = emptyTaps();
+        tapTarget = target.id;
+      }
+      taps = tap(taps, ctx.now() * session.player.rate());
+      const bpm = bpmFromTaps(taps);
+      if (bpm === null) {
+        store.notice.value = { text: `♩ tap ×${taps.taps.length}` };
+        return;
+      }
+      store.notice.value = { text: `♩ ${bpm}` };
+      if (bpm !== target.bpm) updateLesson(upsertSection(l, { ...target, bpm }, ctx.now()));
+    },
+
+    setBpm(bpm: number) {
+      const l = store.lesson.value;
+      const target = selectedOrActive();
+      if (!l || !target) return;
+      updateLesson(upsertSection(l, { ...target, bpm: normalizeBpm(bpm) }, ctx.now()));
+    },
+
+    nudgeBpm(delta: -1 | 1) {
+      const target = selectedOrActive();
+      if (!target || target.bpm === 0) return;
+      commands.setBpm(target.bpm + delta);
+    },
+
+    setBeatsPerBar(n: BeatsPerBar) {
+      const l = store.lesson.value;
+      const target = selectedOrActive();
+      if (!l || !target) return;
+      updateLesson(upsertSection(l, { ...target, beatsPerBar: n }, ctx.now()));
     },
 
     setFlip(mode: FlipMode) { store.flip.value = mode; },
