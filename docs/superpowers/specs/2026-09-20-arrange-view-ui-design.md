@@ -1,7 +1,7 @@
 # Arrange-view UI — design
 
 Date: 2026-09-20
-Status: draft for review. Derived from the Claude Design project
+Status: approved 2026-09-20 (§9 decisions confirmed, §10 answered). Derived from the Claude Design project
 "Loop Lesson Wireframes" (`design/wireframes/Loop Lesson Wireframes.dc.html`,
 turns 1–3). Target: option **3a** (arrange view, LCD speed gauge) on
 desktop; option **1e** (stacked, chunky) under 720 px. Option 2a's
@@ -34,7 +34,7 @@ faster path for editing.
 | Section list | Rows with Edit toggle | Rows: grip · name · range · ×rate; double-click renames inline; `+`/`−` in the header |
 | Gap | 0/1/2/3 s buttons | COUNT IN button (off / 1 bar / 2 bars); seconds gap no longer in the UI (see §9) |
 | Loop / restart / play | Text buttons | Icon buttons in the transport group |
-| Mirror / rotate, frame step, share, library | Buttons in rows | Compact utility cluster (§5.7) — not in the wireframe, placement proposed here |
+| Mirror / rotate, frame step, share, library | Buttons in rows | Overlay pill in the video's bottom corner (§5.7) |
 | Engine, commands, data | — | Unchanged except: continuous rate list, tap/count-in from the metronome spec |
 
 Out of scope (present in earlier wireframes, not in 3a): rep counters
@@ -161,8 +161,10 @@ When the selected/active section has no tempo the button is drawn at
 
 Three cells separated by 1 px dividers on `--lcd-bg`:
 
-- **POSITION** — `mm:ss.hh` of `currentTime` (hundredths; new
-  `formatLcd()` helper next to `formatTime`). Updated every tick.
+- **POSITION** — `mm:ss.t` of `currentTime` (tenths, `formatTime`).
+  The wireframe shows hundredths; tenths match the engine's accuracy.
+  Frame-accurate display is not possible: the IFrame API does not
+  report the video's frame rate. Updated every tick.
 - **SPEED** — the gauge (§5.5) plus `0.80 x`.
 - **TEMPO** — `96 BPM`, or `TAP` when the section's bpm is 0, or
   `tap ×N` while converging. The whole cell is a button:
@@ -192,7 +194,7 @@ ticks every 0.10 from 0.5 to 1.5 plus the two ends. Interactions:
 - **EDIT EDGE** `In | Out` segmented control (UI state, default Out
   after a section is recorded, In after a click near a block's left
   edge). `◀`/`▶` call `nudge(edge, ∓0.1)`; the chip shows the selected
-  edge's time (`mm:ss.hh`). `Shift/Alt + arrows` keep working as
+  edge's time (`mm:ss.t`, tenths). `Shift/Alt + arrows` keep working as
   today; the selector only affects the ◀ ▶ buttons and drags.
 - **Zoom**: slider from 10 s to full length; label "`Ns view`" (or
   "full"). `−`/`+` icons step through 10 / 20 / 50 / 100 / full. Wheel
@@ -218,13 +220,18 @@ ticks every 0.10 from 0.5 to 1.5 plus the two ends. Interactions:
 `setSectionEdge` is a new command (a `nudge` with an absolute value;
 same normalisation, same `updateLesson` path).
 
-### 5.7 Utility cluster (proposal — not in the wireframe)
+### 5.7 Video overlay (utility controls)
 
-Right-aligned in the transport header, small neutral keys:
-`◀ frame` `frame ▶` · `Normal | Mirror | Rotate` · `Share` · `Library`
-(← Library moves here from the page header; the video title stays as a
-one-line caption under the video). On narrow screens this wraps under
-the gauge row. **Needs designer confirmation** — see §10.
+A translucent dark pill (`rgba(20,20,20,.86)`, 5 px radius, as in
+wireframe 1b) anchored to the video's **bottom-right corner**, 8 px
+in, holding small neutral keys: `◀` `▶` (frame step) ·
+`Normal | Mirror | Rotate` · `Share` · `Library`. It sits in the
+un-transformed layer with the click overlay, so it never mirrors or
+rotates with the video, and clicks on it do not reach the play/pause
+overlay. It is always visible (no hover reveal — hands may be on the
+guitar, and touch has no hover); at narrow widths it collapses to
+icons only. The video title becomes a one-line caption under the
+video; the page header goes away.
 
 ### 5.8 Notices and errors
 
@@ -268,7 +275,7 @@ the seconds gap.
 - Colour contrast: LCD green on near-black ≥ 7:1; gold-on-ink and
   white-on-blue block labels ≥ 4.5:1.
 
-## 9. Behaviour decisions made here (confirm or override)
+## 9. Behaviour decisions (all confirmed 2026-09-20)
 
 1. **Seconds gap leaves the UI.** COUNT IN replaces it. For a section
    without a tempo, a count-in setting of 1/2 bars falls back to a
@@ -285,21 +292,21 @@ the seconds gap.
 6. **Zoom is UI-only** and resets to "full" when a lesson opens.
 7. **Tap tempo lives on the TEMPO cell** (plus `T`).
 
-## 10. Open questions for the designer
+## 10. Designer answers (2026-09-20)
 
-- Where do mirror/rotate, frame step, share and library go? §5.7 is a
-  placeholder.
-- Should the position LCD show hundredths (as drawn) when the engine's
-  accuracy is ±0.1 s? Proposed: yes, it's a readout, not a promise.
-- Narrow layout: keep the gauge or fall back to 2a's fader? Proposed:
-  gauge, larger (44 px).
-- Is the light chrome final, or should the app stay dark with only
-  the strip styled?
+- Utility controls (mirror/rotate, frame step, share, library): overlay
+  on the video, bottom corner → §5.7.
+- Position readout: tenths, not hundredths (frames would be preferred
+  but the player cannot report frame rate) → §5.4.
+- Narrow layout keeps the gauge (44 px).
+- Styling is **not final**. All colours, gradients and glows are CSS
+  custom properties (§4) so a restyle is a token change; component
+  structure must not bake in any colour.
 
 ## 11. Testing
 
 - Unit: `ui/arrange/math.ts` (snap, tick spacing, follow, visible
-  range), `formatLcd`, the new `setSectionEdge` command, `DEFAULT_RATES`
+  range), the new `setSectionEdge` command, `DEFAULT_RATES`
   generation and `rateStep` at 0.05.
 - Browser checklist (Chrome DevTools, as before): record a section
   with REC/END and see the striped block grow; drag an Out edge with
@@ -308,12 +315,11 @@ the seconds gap.
   narrow layout at 390 px with no horizontal scroll; hotkeys still
   work after clicking the lane.
 
-## 12. Relationship to the other specs
+## 12. Relationship to the other specs (agreed)
 
-- **Metronome count-in** supplies TEMPO and COUNT IN. Build order:
-  metronome engine/commands → this UI (their minimal controls are
-  replaced by §5.3/§5.4) → nothing else waits on this.
-- **Multi-source playback** (`multi-source.md`) is independent of
-  this layout: it swaps the video area for artwork and adds a source
-  picker to the lesson picker. Its adapter interface maps onto the
-  existing `PlayerPort`; that reconciliation is its own spec pass.
+- **Metronome count-in first**, then this UI (its minimal controls are
+  replaced by §5.3/§5.4).
+- **Multi-source playback** (`multi-source.md`) gets its own
+  reconciliation spec after this UI is working. It is independent of
+  the layout: it swaps the video area for artwork and adds a source
+  picker; its adapter interface maps onto the existing `PlayerPort`.
