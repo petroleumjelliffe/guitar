@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics=""><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&amp;family=Space+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet"><style>body{margin:0;background:#f0eee9;font-family:'Space Grotesk',system-ui,sans-serif}a{color:#2a78d6}a:hover{color:#1b5aa8}.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}.dv-tname{font:600 13px/1.2 'Space Grotesk',system-ui,sans-serif;color:#1a1a1a}.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 'Space Grotesk',system-ui,sans-serif;color:rgba(0,0,0,.55)}.dv-card{max-width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}.dv-next{margin:22px 0 0;font:12px/1.5 'Space Grotesk',system-ui,sans-serif;color:rgba(0,0,0,.5)}.note{font-family:'Architects Daughter',cursive;color:#c1440e}</style></helmet>
+
+<section class="dv-turn" id="t3">
+<div class="dv-thd"><a class="dv-tid" href="#t3">3</a><span class="dv-tname">Speed as an LCD gauge</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="3a">
+<div class="dv-olabel"><a class="dv-oid" href="#3a">3a</a>Arrange view — speed gauge instead of a fader</div>
+<div class="dv-card" style="width:1160px;box-sizing:border-box;background:#d8d5cf;padding:14px;display:flex;flex-direction:column;gap:12px">
+
+  <div style="display:flex;gap:12px;align-items:stretch">
+    <div style="width:560px;aspect-ratio:16/9;border-radius:6px;background:#0d0d0e;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)">
+      <svg width="54" height="54" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="#4a4a4c" stroke-width="1.2"/><path d="M10 8.5l6 3.5-6 3.5z" fill="#4a4a4c"/></svg>
+    </div>
+
+    <div style="flex:1;border-radius:6px;background:#f6f5f2;box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 3px rgba(0,0,0,.18);display:flex;flex-direction:column;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:linear-gradient(#efeeea,#e2e0db);border-bottom:1px solid #c4c1ba">
+        <span style="font:600 10px 'Space Grotesk';letter-spacing:.1em;color:#3a3a38">SECTIONS</span>
+        <div style="display:flex;gap:5px">
+          <div style="width:22px;height:19px;border-radius:4px;background:linear-gradient(#fdfdfc,#e6e4df);border:1px solid #b6b3ac;display:flex;align-items:center;justify-content:center;font:500 13px 'Space Grotesk';color:#444;line-height:1">+</div>
+          <div style="width:22px;height:19px;border-radius:4px;background:linear-gradient(#fdfdfc,#e6e4df);border:1px solid #b6b3ac;display:flex;align-items:center;justify-content:center;font:500 13px 'Space Grotesk';color:#444;line-height:1">−</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 1fr auto 44px;align-items:center;padding:7px 10px;gap:8px;border-bottom:1px solid #e3e1dc">
+        <svg width="10" height="12" viewBox="0 0 10 12"><g fill="#b3b0a9"><circle cx="2.5" cy="2" r="1.1"/><circle cx="7.5" cy="2" r="1.1"/><circle cx="2.5" cy="6" r="1.1"/><circle cx="7.5" cy="6" r="1.1"/><circle cx="2.5" cy="10" r="1.1"/><circle cx="7.5" cy="10" r="1.1"/></g></svg>
+        <span style="font:500 12px 'Space Grotesk';color:#25251f">Section 1</span>
+        <span style="font:400 10px ui-monospace,Menlo,monospace;color:#8a877f">5:09.9 – 5:17.1</span>
+        <span style="font:500 10px ui-monospace,Menlo,monospace;color:#8a877f;text-align:right">×1</span>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 1fr auto 44px;align-items:center;padding:7px 10px;gap:8px;border-bottom:1px solid #e3e1dc">
+        <svg width="10" height="12" viewBox="0 0 10 12"><g fill="#b3b0a9"><circle cx="2.5" cy="2" r="1.1"/><circle cx="7.5" cy="2" r="1.1"/><circle cx="2.5" cy="6" r="1.1"/><circle cx="7.5" cy="6" r="1.1"/><circle cx="2.5" cy="10" r="1.1"/><circle cx="7.5" cy="10" r="1.1"/></g></svg>
+        <span style="font:500 12px 'Space Grotesk';color:#25251f">Section 2</span>
+        <span style="font:400 10px ui-monospace,Menlo,monospace;color:#8a877f">5:21.9 – 5:32.6</span>
+        <span style="font:500 10px ui-monospace,Menlo,monospace;color:#8a877f;text-align:right">×1</span>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 1fr auto 44px;align-items:center;padding:7px 10px;gap:8px;border-bottom:1px solid #e3e1dc;background:linear-gradient(#ffe9ad,#ffdf8f);box-shadow:inset 3px 0 0 #d99b12">
+        <svg width="10" height="12" viewBox="0 0 10 12"><g fill="#b39442"><circle cx="2.5" cy="2" r="1.1"/><circle cx="7.5" cy="2" r="1.1"/><circle cx="2.5" cy="6" r="1.1"/><circle cx="7.5" cy="6" r="1.1"/><circle cx="2.5" cy="10" r="1.1"/><circle cx="7.5" cy="10" r="1.1"/></g></svg>
+        <span style="font:600 12px 'Space Grotesk';color:#20200c">Section 3</span>
+        <span style="font:400 10px ui-monospace,Menlo,monospace;color:#6d5510">5:36.1 – 5:44.3</span>
+        <span style="font:600 10px ui-monospace,Menlo,monospace;color:#6d5510;text-align:right">×1</span>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 1fr auto 44px;align-items:center;padding:7px 10px;gap:8px;border-bottom:1px solid #e3e1dc">
+        <svg width="10" height="12" viewBox="0 0 10 12"><g fill="#b3b0a9"><circle cx="2.5" cy="2" r="1.1"/><circle cx="7.5" cy="2" r="1.1"/><circle cx="2.5" cy="6" r="1.1"/><circle cx="7.5" cy="6" r="1.1"/><circle cx="2.5" cy="10" r="1.1"/><circle cx="7.5" cy="10" r="1.1"/></g></svg>
+        <span style="font:500 12px 'Space Grotesk';color:#25251f">Section 4</span>
+        <span style="font:400 10px ui-monospace,Menlo,monospace;color:#8a877f">5:50.4 – 6:01.4</span>
+        <span style="font:500 10px ui-monospace,Menlo,monospace;color:#8a877f;text-align:right">×1</span>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 1fr auto 44px;align-items:center;padding:7px 10px;gap:8px">
+        <svg width="10" height="12" viewBox="0 0 10 12"><g fill="#b3b0a9"><circle cx="2.5" cy="2" r="1.1"/><circle cx="7.5" cy="2" r="1.1"/><circle cx="2.5" cy="6" r="1.1"/><circle cx="7.5" cy="6" r="1.1"/><circle cx="2.5" cy="10" r="1.1"/><circle cx="7.5" cy="10" r="1.1"/></g></svg>
+        <span style="font:500 12px 'Space Grotesk';color:#25251f">Section 5</span>
+        <span style="font:400 10px ui-monospace,Menlo,monospace;color:#8a877f">6:05.1 – 6:16.8</span>
+        <span style="font:500 10px ui-monospace,Menlo,monospace;color:#8a877f;text-align:right">×1</span>
+      </div>
+      <div style="margin-top:auto;padding:7px 10px;border-top:1px solid #d5d2cb;background:#eeece8;font:400 10px 'Space Grotesk';color:#8a877f">Drag to reorder · double-click to rename</div>
+    </div>
+  </div>
+
+  <div style="border-radius:6px;background:linear-gradient(#3a3a3c,#2a2a2c);box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 2px 6px rgba(0,0,0,.28);display:flex;flex-direction:column">
+
+    <div style="display:flex;align-items:flex-start;gap:16px;padding:10px 14px;border-bottom:1px solid #1e1e20">
+
+      <div style="display:flex;flex-direction:column;gap:3px;padding:6px 0">
+        <span style="display:block;height:10px;font:500 8px/10px 'Space Grotesk';letter-spacing:.14em;color:#9b9891">TRANSPORT</span>
+        <div style="height:34px;display:flex;align-items:center"><div style="display:flex;gap:6px;align-items:center"><div style="width:34px;height:30px;border-radius:5px;background:linear-gradient(#55555a,#3d3d42);border:1px solid #232326;box-shadow:0 1px 0 rgba(255,255,255,.2) inset;display:flex;align-items:center;justify-content:center;gap:5px"><svg width="15" height="12" viewBox="0 0 15 12" fill="#e8e6e1"><path d="M2 1h1.6v10H2zM13 1v10L5.5 6z"/></svg></div><div style="width:46px;height:30px;border-radius:5px;background:linear-gradient(#7fd3a4,#3fa873);border:1px solid #1e5b3c;box-shadow:0 1px 0 rgba(255,255,255,.2) inset,0 0 8px rgba(80,220,150,.35);display:flex;align-items:center;justify-content:center;gap:5px"><svg width="13" height="14" viewBox="0 0 13 14" fill="#0e2d1e"><path d="M1 1h4v12H1zM8 1h4v12H8z"/></svg></div><div style="width:34px;height:30px;border-radius:5px;background:linear-gradient(#55555a,#3d3d42);border:1px solid #232326;box-shadow:0 1px 0 rgba(255,255,255,.2) inset;display:flex;align-items:center;justify-content:center;gap:5px"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#e8e6e1" stroke-width="1.4"><path d="M1 7a6 6 0 016-6 6 6 0 015.2 3"/><path d="M13 7a6 6 0 01-6 6 6 6 0 01-5.2-3"/><path d="M12.3 1v3h-3" stroke-linejoin="round"/><path d="M1.7 13v-3h3" stroke-linejoin="round"/></svg></div><div style="width:74px;height:30px;border-radius:5px;background:linear-gradient(#e8705f,#c0402f);border:1px solid #6e1d14;box-shadow:0 1px 0 rgba(255,255,255,.2) inset,0 0 8px rgba(230,90,70,.35);display:flex;align-items:center;justify-content:center;gap:5px"><svg width="9" height="9" viewBox="0 0 9 9"><rect x="0.5" y="0.5" width="8" height="8" rx="1" fill="#2a0d09"/></svg><span style="font:600 10px 'Space Grotesk';color:#2a0d09;letter-spacing:.04em">END</span></div></div></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:3px;padding:6px 0">
+        <span style="display:block;height:10px;font:500 8px/10px 'Space Grotesk';letter-spacing:.14em;color:#9b9891">COUNT IN</span>
+        <div style="height:34px;display:flex;align-items:center"><div style="width:58px;height:30px;border-radius:5px;background:linear-gradient(#8ecbff,#3f86c4);border:1px solid #1d4a6e;box-shadow:0 1px 0 rgba(255,255,255,.2) inset;display:flex;align-items:center;justify-content:center;gap:5px"><span style="font:600 11px 'Space Grotesk';color:#0d2536">2 bars</span></div></div>
+      </div>
+
+      <div style="flex:none;white-space:nowrap;display:flex;align-items:flex-start;gap:14px;padding:6px 14px;border-radius:5px;background:#0c1512;border:1px solid #19211d;box-shadow:0 1px 3px rgba(0,0,0,.5) inset">
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <span style="display:block;height:10px;font:400 7px/10px 'Space Grotesk';letter-spacing:.14em;color:#3e7a5f">POSITION</span>
+          <div style="height:34px;display:flex;align-items:center"><span style="white-space:nowrap;font:500 16px/1 ui-monospace,Menlo,monospace;color:#7fe0b0">05:38.42</span></div>
+        </div>
+        <div style="width:1px;align-self:stretch;background:#1d2b24"></div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <span style="display:block;height:10px;font:400 7px/10px 'Space Grotesk';letter-spacing:.14em;color:#3e7a5f">SPEED</span>
+          <div style="height:34px;display:flex;align-items:center"><div style="display:flex;align-items:center;gap:9px"><svg width="34" height="34" viewBox="0 0 30 30"><circle cx="15" cy="15" r="11.5" fill="none" stroke="#17332a" stroke-width="3"/><path d="M15 3.5 A11.5 11.5 0 0 0 5.04 9.25" fill="none" stroke="#7fe0b0" stroke-width="3" stroke-linecap="round"/><path d="M10.70 22.45 L8.70 25.91" stroke="#2c5d4a" stroke-width="1" stroke-linecap="round"/><path d="M7.55 19.30 L4.09 21.30" stroke="#2c5d4a" stroke-width="1" stroke-linecap="round"/><path d="M6.40 15.00 L2.40 15.00" stroke="#2c5d4a" stroke-width="1" stroke-linecap="round"/><path d="M7.55 10.70 L4.09 8.70" stroke="#2c5d4a" stroke-width="1" stroke-linecap="round"/><path d="M10.70 7.55 L8.70 4.09" stroke="#2c5d4a" stroke-width="1" stroke-linecap="round"/><path d="M15.00 7.40 L15.00 1.60" stroke="#7fe0b0" stroke-width="1.6" stroke-linecap="round"/><path d="M19.30 7.55 L21.30 4.09" stroke="#2c5d4a" stroke-width="1" stroke-linecap="round"/><path d="M22.45 10.70 L25.91 8.70" stroke="#2c5d4a" stroke-width="1" stroke-linecap="round"/><path d="M23.60 15.00 L27.60 15.00" stroke="#2c5d4a" stroke-width="1" stroke-linecap="round"/><path d="M22.45 19.30 L25.91 21.30" stroke="#2c5d4a" stroke-width="1" stroke-linecap="round"/><path d="M19.30 22.45 L21.30 25.91" stroke="#2c5d4a" stroke-width="1" stroke-linecap="round"/></svg><span style="white-space:nowrap;font:500 16px/1 ui-monospace,Menlo,monospace;color:#7fe0b0">0.80 <span style="font-size:10px;color:#4e8f70">x</span></span></div></div>
+        </div>
+        <div style="width:1px;align-self:stretch;background:#1d2b24"></div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <span style="display:block;height:10px;font:400 7px/10px 'Space Grotesk';letter-spacing:.14em;color:#3e7a5f">TEMPO</span>
+          <div style="height:34px;display:flex;align-items:center"><span style="white-space:nowrap;font:500 16px/1 ui-monospace,Menlo,monospace;color:#7fe0b0">96 <span style="font-size:10px;color:#4e8f70">BPM</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex">
+      <div style="flex:1;padding:8px 14px 12px;min-width:0">
+
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="font:500 8px 'Space Grotesk';letter-spacing:.14em;color:#9b9891">EDIT EDGE</span>
+            <div style="display:flex;border-radius:4px;overflow:hidden;border:1px solid #232326">
+              <div style="padding:4px 9px;background:linear-gradient(#55555a,#3d3d42);font:500 10px 'Space Grotesk';color:#b9b6b0">In</div>
+              <div style="padding:4px 9px;background:linear-gradient(#f0c35c,#dda92f);font:600 10px 'Space Grotesk';color:#33260a;border-left:1px solid #232326">Out</div>
+            </div>
+            <div style="display:flex;gap:3px">
+              <div style="width:24px;height:22px;border-radius:4px;background:linear-gradient(#55555a,#3d3d42);border:1px solid #232326;display:flex;align-items:center;justify-content:center"><svg width="6" height="9" viewBox="0 0 6 9" fill="#e8e6e1"><path d="M6 0L0 4.5 6 9z"/></svg></div>
+              <div style="width:24px;height:22px;border-radius:4px;background:linear-gradient(#55555a,#3d3d42);border:1px solid #232326;display:flex;align-items:center;justify-content:center"><svg width="6" height="9" viewBox="0 0 6 9" fill="#e8e6e1"><path d="M0 0l6 4.5L0 9z"/></svg></div>
+            </div>
+            <span style="font:400 9px ui-monospace,Menlo,monospace;color:#8b8882">±0.10s</span>
+            <span style="padding:3px 6px;border-radius:3px;background:#0c1512;border:1px solid #2a3b32;font:500 10px ui-monospace,Menlo,monospace;color:#7fe0b0">5:44.30</span>
+          </div>
+
+          <div style="margin-left:auto;display:flex;align-items:center;gap:9px">
+            <span style="font:400 9px ui-monospace,Menlo,monospace;color:#8b8882">50s view</span>
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#9b9891" stroke-width="1.3"><circle cx="5" cy="5" r="3.6"/><path d="M7.8 7.8L11 11M3.3 5h3.4"/></svg>
+            <div style="position:relative;width:104px;height:20px">
+              <div style="position:absolute;top:8px;left:0;right:0;height:4px;border-radius:2px;background:#17171a;box-shadow:0 1px 2px rgba(0,0,0,.6) inset"></div>
+              <div style="position:absolute;top:8px;left:0;width:42%;height:4px;border-radius:2px;background:#5a5852"></div>
+              <div style="position:absolute;top:14px;left:0;right:0;display:flex;justify-content:space-between"><div style="width:1px;height:4px;background:#6f6c67"></div><div style="width:1px;height:4px;background:#6f6c67"></div><div style="width:1px;height:4px;background:#6f6c67"></div><div style="width:1px;height:4px;background:#6f6c67"></div><div style="width:1px;height:4px;background:#6f6c67"></div></div>
+              <div style="position:absolute;top:1px;left:42%;margin-left:-6px;width:12px;height:18px;border-radius:3px;background:linear-gradient(#fbfaf7,#c9c6bf);border:1px solid #16161a"></div>
+            </div>
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#9b9891" stroke-width="1.3"><circle cx="5" cy="5" r="3.6"/><path d="M7.8 7.8L11 11M3.3 5h3.4M5 3.3v3.4"/></svg>
+          </div>
+        </div>
+
+        <div style="position:relative;height:16px;border-bottom:1px solid #45454a;margin-bottom:6px">
+          <span style="position:absolute;left:0;top:2px;font:400 8px ui-monospace,Menlo,monospace;color:#8b8882">5:20</span>
+          <span style="position:absolute;left:20%;top:2px;font:400 8px ui-monospace,Menlo,monospace;color:#8b8882">5:30</span>
+          <span style="position:absolute;left:40%;top:2px;font:400 8px ui-monospace,Menlo,monospace;color:#8b8882">5:40</span>
+          <span style="position:absolute;left:60%;top:2px;font:400 8px ui-monospace,Menlo,monospace;color:#8b8882">5:50</span>
+          <span style="position:absolute;left:80%;top:2px;font:400 8px ui-monospace,Menlo,monospace;color:#8b8882">6:00</span>
+          <div style="position:absolute;left:0;right:0;bottom:0;display:flex">
+            <div style="flex:1;display:flex;justify-content:space-between"><div style="width:1px;height:7px;background:#5c5a56"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div></div>
+            <div style="flex:1;display:flex;justify-content:space-between"><div style="width:1px;height:7px;background:#5c5a56"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div></div>
+            <div style="flex:1;display:flex;justify-content:space-between"><div style="width:1px;height:7px;background:#5c5a56"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div></div>
+            <div style="flex:1;display:flex;justify-content:space-between"><div style="width:1px;height:7px;background:#5c5a56"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div></div>
+            <div style="flex:1;display:flex;justify-content:space-between"><div style="width:1px;height:7px;background:#5c5a56"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div></div>
+          </div>
+        </div>
+
+        <div style="position:relative;height:52px;border-radius:4px;background:repeating-linear-gradient(90deg,#1c1c1f 0,#1c1c1f 19px,#212124 19px,#212124 20px);box-shadow:0 1px 3px rgba(0,0,0,.5) inset;overflow:hidden">
+          <div style="position:absolute;left:-4%;width:16%;top:5px;bottom:5px;border-radius:4px;background:linear-gradient(#4c86b5,#35688f);border:1px solid #7fb4dc;padding:4px 6px;font:500 10px 'Space Grotesk';color:#eaf4fb;text-align:right">Sec 2</div>
+          <div style="position:absolute;left:20%;width:20%;top:5px;bottom:5px;border-radius:4px;background:linear-gradient(#f0c35c,#dda92f);border:1.5px solid #fff1c4;padding:4px 6px;font:600 10px 'Space Grotesk';color:#33260a;box-shadow:0 0 10px rgba(240,200,90,.35)">Sec 3
+            <div style="position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:3px 0 0 3px;background:rgba(255,255,255,.5)"></div>
+            <div style="position:absolute;right:-1px;top:-3px;bottom:-3px;width:7px;border-radius:3px;background:#fff;box-shadow:0 0 8px rgba(255,255,255,.8)"></div>
+          </div>
+          <div style="position:absolute;left:46%;width:16%;top:5px;bottom:5px;border-radius:4px;background:linear-gradient(#4c86b5,#35688f);border:1px solid #7fb4dc;padding:4px 6px;font:500 10px 'Space Grotesk';color:#eaf4fb">Sec 4</div>
+          <div style="position:absolute;left:68%;width:14%;top:5px;bottom:5px;border-radius:4px;background:repeating-linear-gradient(135deg,#b8432f 0,#b8432f 6px,#a13a29 6px,#a13a29 12px);border:1.5px dashed #ff9f8c;padding:4px 6px;font:600 10px 'Space Grotesk';color:#ffe6df">Recording…</div>
+          <div style="position:absolute;left:82%;top:0;bottom:0;width:1.5px;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.5)"></div>
+        </div>
+        <div style="position:absolute;display:none"></div>
+      </div>
+    </div>
+  </div>
+  <div class="note" style="font-size:12px;margin-top:2px">Speed dial reads 1.00x at top, filling counter-clockwise when slower and clockwise when faster; ticks every 0.10. Drag or scroll it. Count-in cycles 0 / 1 / 2 bars against the detected tempo. END closes the section that started when you hit the red button — it grows with the playhead until then. Selected section shows its Out edge grabbed: drag it (snapping to the zoom's tick size) or nudge with arrow keys. Zoom slider at right; scroll pans.</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">1c built out — real transport controls</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="2a">
+<div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Arrange view, hi-fi controls</div>
+<div class="dv-card" style="width:1160px;box-sizing:border-box;background:#d8d5cf;padding:14px;display:flex;flex-direction:column;gap:12px">
+
+  <div style="display:flex;gap:12px;align-items:stretch">
+    <div style="width:560px;aspect-ratio:16/9;border-radius:6px;background:#0d0d0e;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)">
+      <svg width="54" height="54" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="#4a4a4c" stroke-width="1.2"/><path d="M10 8.5l6 3.5-6 3.5z" fill="#4a4a4c"/></svg>
+    </div>
+
+    <div style="flex:1;border-radius:6px;background:#f6f5f2;box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 1px 3px rgba(0,0,0,.18);display:flex;flex-direction:column;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:linear-gradient(#efeeea,#e2e0db);border-bottom:1px solid #c4c1ba">
+        <span style="font:600 10px 'Space Grotesk';letter-spacing:.1em;color:#3a3a38">SECTIONS</span>
+        <div style="display:flex;gap:5px">
+          <div style="width:22px;height:19px;border-radius:4px;background:linear-gradient(#fdfdfc,#e6e4df);border:1px solid #b6b3ac;display:flex;align-items:center;justify-content:center;font:500 13px 'Space Grotesk';color:#444;line-height:1">+</div>
+          <div style="width:22px;height:19px;border-radius:4px;background:linear-gradient(#fdfdfc,#e6e4df);border:1px solid #b6b3ac;display:flex;align-items:center;justify-content:center;font:500 13px 'Space Grotesk';color:#444;line-height:1">−</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 1fr auto 44px;align-items:center;padding:7px 10px;gap:8px;border-bottom:1px solid #e3e1dc">
+        <svg width="10" height="12" viewBox="0 0 10 12"><g fill="#b3b0a9"><circle cx="2.5" cy="2" r="1.1"/><circle cx="7.5" cy="2" r="1.1"/><circle cx="2.5" cy="6" r="1.1"/><circle cx="7.5" cy="6" r="1.1"/><circle cx="2.5" cy="10" r="1.1"/><circle cx="7.5" cy="10" r="1.1"/></g></svg>
+        <span style="font:500 12px 'Space Grotesk';color:#25251f">Section 1</span>
+        <span style="font:400 10px ui-monospace,Menlo,monospace;color:#8a877f">5:09.9 – 5:17.1</span>
+        <span style="font:500 10px ui-monospace,Menlo,monospace;color:#8a877f;text-align:right">×1</span>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 1fr auto 44px;align-items:center;padding:7px 10px;gap:8px;border-bottom:1px solid #e3e1dc">
+        <svg width="10" height="12" viewBox="0 0 10 12"><g fill="#b3b0a9"><circle cx="2.5" cy="2" r="1.1"/><circle cx="7.5" cy="2" r="1.1"/><circle cx="2.5" cy="6" r="1.1"/><circle cx="7.5" cy="6" r="1.1"/><circle cx="2.5" cy="10" r="1.1"/><circle cx="7.5" cy="10" r="1.1"/></g></svg>
+        <span style="font:500 12px 'Space Grotesk';color:#25251f">Section 2</span>
+        <span style="font:400 10px ui-monospace,Menlo,monospace;color:#8a877f">5:21.9 – 5:32.6</span>
+        <span style="font:500 10px ui-monospace,Menlo,monospace;color:#8a877f;text-align:right">×1</span>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 1fr auto 44px;align-items:center;padding:7px 10px;gap:8px;border-bottom:1px solid #e3e1dc;background:linear-gradient(#ffe9ad,#ffdf8f);box-shadow:inset 3px 0 0 #d99b12">
+        <svg width="10" height="12" viewBox="0 0 10 12"><g fill="#b39442"><circle cx="2.5" cy="2" r="1.1"/><circle cx="7.5" cy="2" r="1.1"/><circle cx="2.5" cy="6" r="1.1"/><circle cx="7.5" cy="6" r="1.1"/><circle cx="2.5" cy="10" r="1.1"/><circle cx="7.5" cy="10" r="1.1"/></g></svg>
+        <span style="font:600 12px 'Space Grotesk';color:#20200c">Section 3</span>
+        <span style="font:400 10px ui-monospace,Menlo,monospace;color:#6d5510">5:36.1 – 5:44.3</span>
+        <span style="font:600 10px ui-monospace,Menlo,monospace;color:#6d5510;text-align:right">×1</span>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 1fr auto 44px;align-items:center;padding:7px 10px;gap:8px;border-bottom:1px solid #e3e1dc">
+        <svg width="10" height="12" viewBox="0 0 10 12"><g fill="#b3b0a9"><circle cx="2.5" cy="2" r="1.1"/><circle cx="7.5" cy="2" r="1.1"/><circle cx="2.5" cy="6" r="1.1"/><circle cx="7.5" cy="6" r="1.1"/><circle cx="2.5" cy="10" r="1.1"/><circle cx="7.5" cy="10" r="1.1"/></g></svg>
+        <span style="font:500 12px 'Space Grotesk';color:#25251f">Section 4</span>
+        <span style="font:400 10px ui-monospace,Menlo,monospace;color:#8a877f">5:50.4 – 6:01.4</span>
+        <span style="font:500 10px ui-monospace,Menlo,monospace;color:#8a877f;text-align:right">×1</span>
+      </div>
+      <div style="display:grid;grid-template-columns:18px 1fr auto 44px;align-items:center;padding:7px 10px;gap:8px">
+        <svg width="10" height="12" viewBox="0 0 10 12"><g fill="#b3b0a9"><circle cx="2.5" cy="2" r="1.1"/><circle cx="7.5" cy="2" r="1.1"/><circle cx="2.5" cy="6" r="1.1"/><circle cx="7.5" cy="6" r="1.1"/><circle cx="2.5" cy="10" r="1.1"/><circle cx="7.5" cy="10" r="1.1"/></g></svg>
+        <span style="font:500 12px 'Space Grotesk';color:#25251f">Section 5</span>
+        <span style="font:400 10px ui-monospace,Menlo,monospace;color:#8a877f">6:05.1 – 6:16.8</span>
+        <span style="font:500 10px ui-monospace,Menlo,monospace;color:#8a877f;text-align:right">×1</span>
+      </div>
+      <div style="margin-top:auto;padding:7px 10px;border-top:1px solid #d5d2cb;background:#eeece8;font:400 10px 'Space Grotesk';color:#8a877f">Drag to reorder · double-click to rename</div>
+    </div>
+  </div>
+
+  <div style="border-radius:6px;background:linear-gradient(#3a3a3c,#2a2a2c);box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 2px 6px rgba(0,0,0,.28);display:flex;flex-direction:column">
+
+    <div style="display:flex;align-items:center;gap:16px;padding:10px 14px;border-bottom:1px solid #1e1e20">
+
+      <div style="display:flex;gap:6px;align-items:center">
+        <div style="width:34px;height:30px;border-radius:5px;background:linear-gradient(#55555a,#3d3d42);border:1px solid #232326;box-shadow:0 1px 0 rgba(255,255,255,.14) inset;display:flex;align-items:center;justify-content:center">
+          <svg width="15" height="12" viewBox="0 0 15 12" fill="#e8e6e1"><path d="M2 1h1.6v10H2zM13 1v10L5.5 6z"/></svg>
+        </div>
+        <div style="width:46px;height:30px;border-radius:5px;background:linear-gradient(#7fd3a4,#3fa873);border:1px solid #1e5b3c;box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 0 8px rgba(80,220,150,.35);display:flex;align-items:center;justify-content:center">
+          <svg width="13" height="14" viewBox="0 0 13 14" fill="#0e2d1e"><path d="M1 1h4v12H1zM8 1h4v12H8z"/></svg>
+        </div>
+        <div style="width:34px;height:30px;border-radius:5px;background:linear-gradient(#55555a,#3d3d42);border:1px solid #232326;box-shadow:0 1px 0 rgba(255,255,255,.14) inset;display:flex;align-items:center;justify-content:center">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#e8e6e1" stroke-width="1.4"><path d="M1 7a6 6 0 016-6 6 6 0 015.2 3"/><path d="M13 7a6 6 0 01-6 6 6 6 0 01-5.2-3"/><path d="M12.3 1v3h-3" stroke-linejoin="round"/><path d="M1.7 13v-3h3" stroke-linejoin="round"/></svg>
+        </div>
+        <div style="width:74px;height:30px;border-radius:5px;background:linear-gradient(#e8705f,#c0402f);border:1px solid #6e1d14;box-shadow:0 1px 0 rgba(255,255,255,.28) inset,0 0 8px rgba(230,90,70,.35);display:flex;align-items:center;justify-content:center;gap:5px">
+          <svg width="9" height="9" viewBox="0 0 9 9"><rect x="0.5" y="0.5" width="8" height="8" rx="1" fill="#2a0d09"/></svg>
+          <span style="font:600 10px 'Space Grotesk';color:#2a0d09;letter-spacing:.04em">END</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <span style="font:500 8px 'Space Grotesk';letter-spacing:.14em;color:#9b9891">COUNT IN</span>
+          <div style="width:58px;height:24px;border-radius:4px;background:linear-gradient(#8ecbff,#3f86c4);border:1px solid #1d4a6e;box-shadow:0 1px 0 rgba(255,255,255,.3) inset;display:flex;align-items:center;justify-content:center">
+            <span style="font:600 11px 'Space Grotesk';color:#0d2536">2 bars</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:none;white-space:nowrap;display:flex;align-items:center;gap:14px;padding:6px 14px;border-radius:5px;background:#0c1512;border:1px solid #19211d;box-shadow:0 1px 3px rgba(0,0,0,.5) inset">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <span style="font:400 7px 'Space Grotesk';letter-spacing:.14em;color:#3e7a5f">POSITION</span>
+          <span style="white-space:nowrap;font:500 16px/1 ui-monospace,Menlo,monospace;color:#7fe0b0">05:38.42</span>
+        </div>
+        <div style="width:1px;align-self:stretch;background:#1d2b24"></div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <span style="font:400 7px 'Space Grotesk';letter-spacing:.14em;color:#3e7a5f">TEMPO</span>
+          <span style="white-space:nowrap;font:500 16px/1 ui-monospace,Menlo,monospace;color:#7fe0b0">96 <span style="font-size:10px;color:#4e8f70">BPM</span></span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:210px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font:500 8px 'Space Grotesk';letter-spacing:.14em;color:#9b9891">SPEED</span>
+          <div style="flex:1;position:relative;height:24px">
+            <div style="position:absolute;top:10px;left:0;right:0;height:5px;border-radius:3px;background:#17171a;box-shadow:0 1px 2px rgba(0,0,0,.6) inset,0 1px 0 rgba(255,255,255,.08)"></div>
+            <div style="position:absolute;top:10px;left:0;width:60%;height:5px;border-radius:3px;background:linear-gradient(#5aa8e0,#2f6c9c)"></div>
+            <div style="position:absolute;top:18px;left:0;right:0;display:flex;justify-content:space-between">
+              <div style="width:1px;height:5px;background:#6f6c67"></div><div style="width:1px;height:5px;background:#6f6c67"></div><div style="width:1px;height:5px;background:#6f6c67"></div><div style="width:1px;height:5px;background:#6f6c67"></div><div style="width:1px;height:5px;background:#6f6c67"></div><div style="width:1px;height:5px;background:#6f6c67"></div>
+            </div>
+            <div style="position:absolute;top:2px;left:60%;margin-left:-8px;width:16px;height:22px;border-radius:4px;background:linear-gradient(#fbfaf7,#c9c6bf);border:1px solid #16161a;box-shadow:0 1px 3px rgba(0,0,0,.5)">
+              <div style="position:absolute;left:50%;top:5px;bottom:5px;width:1px;background:#a09d96"></div>
+            </div>
+          </div>
+          <span style="flex:none;white-space:nowrap;padding:4px 7px;border-radius:4px;background:#0c1512;border:1px solid #19211d;box-shadow:0 1px 3px rgba(0,0,0,.5) inset;font:500 13px/1 ui-monospace,Menlo,monospace;color:#7fe0b0">0.80 x</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding-left:46px;padding-right:56px">
+          <span style="font:400 7px ui-monospace,Menlo,monospace;color:#8b8882">50</span><span style="font:400 7px ui-monospace,Menlo,monospace;color:#8b8882">60</span><span style="font:400 7px ui-monospace,Menlo,monospace;color:#8b8882">70</span><span style="font:400 7px ui-monospace,Menlo,monospace;color:#8b8882">80</span><span style="font:400 7px ui-monospace,Menlo,monospace;color:#8b8882">90</span><span style="font:400 7px ui-monospace,Menlo,monospace;color:#8b8882">100</span>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <span style="font:500 8px 'Space Grotesk';letter-spacing:.14em;color:#9b9891">VOLUME</span>
+          <div style="display:flex;align-items:center;gap:7px;height:24px">
+            <svg width="14" height="12" viewBox="0 0 14 12" fill="none"><path d="M1 4.5h2.5L6.5 2v8L3.5 7.5H1z" fill="#c9c6bf"/><path d="M9 4a3.4 3.4 0 010 4M11 2.2a6 6 0 010 7.6" stroke="#c9c6bf" stroke-width="1.1" stroke-linecap="round"/></svg>
+            <div style="position:relative;width:76px;height:24px">
+              <div style="position:absolute;top:10px;left:0;right:0;height:5px;border-radius:3px;background:#17171a;box-shadow:0 1px 2px rgba(0,0,0,.6) inset"></div>
+              <div style="position:absolute;top:10px;left:0;width:72%;height:5px;border-radius:3px;background:#6e6b65"></div>
+              <div style="position:absolute;top:3px;left:72%;margin-left:-7px;width:14px;height:20px;border-radius:4px;background:linear-gradient(#fbfaf7,#c9c6bf);border:1px solid #16161a"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex">
+      <div style="flex:1;padding:8px 14px 12px;min-width:0">
+
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="font:500 8px 'Space Grotesk';letter-spacing:.14em;color:#9b9891">EDIT EDGE</span>
+            <div style="display:flex;border-radius:4px;overflow:hidden;border:1px solid #232326">
+              <div style="padding:4px 9px;background:linear-gradient(#55555a,#3d3d42);font:500 10px 'Space Grotesk';color:#b9b6b0">In</div>
+              <div style="padding:4px 9px;background:linear-gradient(#f0c35c,#dda92f);font:600 10px 'Space Grotesk';color:#33260a;border-left:1px solid #232326">Out</div>
+            </div>
+            <div style="display:flex;gap:3px">
+              <div style="width:24px;height:22px;border-radius:4px;background:linear-gradient(#55555a,#3d3d42);border:1px solid #232326;display:flex;align-items:center;justify-content:center"><svg width="6" height="9" viewBox="0 0 6 9" fill="#e8e6e1"><path d="M6 0L0 4.5 6 9z"/></svg></div>
+              <div style="width:24px;height:22px;border-radius:4px;background:linear-gradient(#55555a,#3d3d42);border:1px solid #232326;display:flex;align-items:center;justify-content:center"><svg width="6" height="9" viewBox="0 0 6 9" fill="#e8e6e1"><path d="M0 0l6 4.5L0 9z"/></svg></div>
+            </div>
+            <span style="font:400 9px ui-monospace,Menlo,monospace;color:#8b8882">±0.10s</span>
+            <span style="padding:3px 6px;border-radius:3px;background:#0c1512;border:1px solid #2a3b32;font:500 10px ui-monospace,Menlo,monospace;color:#7fe0b0">5:44.30</span>
+          </div>
+
+          <div style="margin-left:auto;display:flex;align-items:center;gap:9px">
+            <span style="font:400 9px ui-monospace,Menlo,monospace;color:#8b8882">50s view</span>
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#9b9891" stroke-width="1.3"><circle cx="5" cy="5" r="3.6"/><path d="M7.8 7.8L11 11M3.3 5h3.4"/></svg>
+            <div style="position:relative;width:104px;height:20px">
+              <div style="position:absolute;top:8px;left:0;right:0;height:4px;border-radius:2px;background:#17171a;box-shadow:0 1px 2px rgba(0,0,0,.6) inset"></div>
+              <div style="position:absolute;top:8px;left:0;width:42%;height:4px;border-radius:2px;background:#5a5852"></div>
+              <div style="position:absolute;top:14px;left:0;right:0;display:flex;justify-content:space-between"><div style="width:1px;height:4px;background:#6f6c67"></div><div style="width:1px;height:4px;background:#6f6c67"></div><div style="width:1px;height:4px;background:#6f6c67"></div><div style="width:1px;height:4px;background:#6f6c67"></div><div style="width:1px;height:4px;background:#6f6c67"></div></div>
+              <div style="position:absolute;top:1px;left:42%;margin-left:-6px;width:12px;height:18px;border-radius:3px;background:linear-gradient(#fbfaf7,#c9c6bf);border:1px solid #16161a"></div>
+            </div>
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#9b9891" stroke-width="1.3"><circle cx="5" cy="5" r="3.6"/><path d="M7.8 7.8L11 11M3.3 5h3.4M5 3.3v3.4"/></svg>
+          </div>
+        </div>
+
+        <div style="position:relative;height:16px;border-bottom:1px solid #45454a;margin-bottom:6px">
+          <span style="position:absolute;left:0;top:2px;font:400 8px ui-monospace,Menlo,monospace;color:#8b8882">5:20</span>
+          <span style="position:absolute;left:20%;top:2px;font:400 8px ui-monospace,Menlo,monospace;color:#8b8882">5:30</span>
+          <span style="position:absolute;left:40%;top:2px;font:400 8px ui-monospace,Menlo,monospace;color:#8b8882">5:40</span>
+          <span style="position:absolute;left:60%;top:2px;font:400 8px ui-monospace,Menlo,monospace;color:#8b8882">5:50</span>
+          <span style="position:absolute;left:80%;top:2px;font:400 8px ui-monospace,Menlo,monospace;color:#8b8882">6:00</span>
+          <div style="position:absolute;left:0;right:0;bottom:0;display:flex">
+            <div style="flex:1;display:flex;justify-content:space-between"><div style="width:1px;height:7px;background:#5c5a56"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div></div>
+            <div style="flex:1;display:flex;justify-content:space-between"><div style="width:1px;height:7px;background:#5c5a56"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div></div>
+            <div style="flex:1;display:flex;justify-content:space-between"><div style="width:1px;height:7px;background:#5c5a56"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div></div>
+            <div style="flex:1;display:flex;justify-content:space-between"><div style="width:1px;height:7px;background:#5c5a56"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div></div>
+            <div style="flex:1;display:flex;justify-content:space-between"><div style="width:1px;height:7px;background:#5c5a56"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div><div style="width:1px;height:4px;background:#403e3b"></div></div>
+          </div>
+        </div>
+
+        <div style="position:relative;height:52px;border-radius:4px;background:repeating-linear-gradient(90deg,#1c1c1f 0,#1c1c1f 19px,#212124 19px,#212124 20px);box-shadow:0 1px 3px rgba(0,0,0,.5) inset;overflow:hidden">
+          <div style="position:absolute;left:-4%;width:16%;top:5px;bottom:5px;border-radius:4px;background:linear-gradient(#4c86b5,#35688f);border:1px solid #7fb4dc;padding:4px 6px;font:500 10px 'Space Grotesk';color:#eaf4fb;text-align:right">Sec 2</div>
+          <div style="position:absolute;left:20%;width:20%;top:5px;bottom:5px;border-radius:4px;background:linear-gradient(#f0c35c,#dda92f);border:1.5px solid #fff1c4;padding:4px 6px;font:600 10px 'Space Grotesk';color:#33260a;box-shadow:0 0 10px rgba(240,200,90,.35)">Sec 3
+            <div style="position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:3px 0 0 3px;background:rgba(255,255,255,.5)"></div>
+            <div style="position:absolute;right:-1px;top:-3px;bottom:-3px;width:7px;border-radius:3px;background:#fff;box-shadow:0 0 8px rgba(255,255,255,.8)"></div>
+          </div>
+          <div style="position:absolute;left:46%;width:16%;top:5px;bottom:5px;border-radius:4px;background:linear-gradient(#4c86b5,#35688f);border:1px solid #7fb4dc;padding:4px 6px;font:500 10px 'Space Grotesk';color:#eaf4fb">Sec 4</div>
+          <div style="position:absolute;left:68%;width:14%;top:5px;bottom:5px;border-radius:4px;background:repeating-linear-gradient(135deg,#b8432f 0,#b8432f 6px,#a13a29 6px,#a13a29 12px);border:1.5px dashed #ff9f8c;padding:4px 6px;font:600 10px 'Space Grotesk';color:#ffe6df">Recording…</div>
+          <div style="position:absolute;left:82%;top:0;bottom:0;width:1.5px;background:#fff;box-shadow:0 0 6px rgba(255,255,255,.5)"></div>
+        </div>
+        <div style="position:absolute;display:none"></div>
+      </div>
+    </div>
+  </div>
+  <div class="note" style="font-size:12px;margin-top:2px">Count-in cycles 0 / 1 / 2 bars against the detected tempo. END closes the section that started when you hit the red button — it grows with the playhead until then. Selected section shows its Out edge grabbed: drag it (snapping to the zoom's tick size) or nudge with arrow keys. Zoom slider at right; scroll pans.</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Five layouts — GarageBand-style controls, sections beside the video</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a">
+<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Transport bar under video, sections panel right</div>
+<div class="dv-card" style="width: 868px; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: #fafaf8; height: 566px">
+  <div style="display:flex;gap:12px;align-items:flex-start">
+    <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+      <div style="aspect-ratio:16/9;border:1.5px solid #333;border-radius:4px;background:#e6e4e0;display:flex;align-items:center;justify-content:center;position:relative">
+        <div style="width:0;height:0;border-left:22px solid #9a9791;border-top:14px solid transparent;border-bottom:14px solid transparent"></div>
+        <div style="position:absolute;bottom:6px;left:8px;font-size:9px;letter-spacing:.08em;color:#8a877f">YOUTUBE EMBED</div>
+      </div>
+      <div style="border:1.5px solid #333;border-radius:4px;background:#2b2b2b;padding:10px 12px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="display:flex;gap:4px">
+            <div style="width:26px;height:22px;border:1px solid #777;border-radius:3px;background:#3c3c3c"></div>
+            <div style="width:26px;height:22px;border:1px solid #777;border-radius:3px;background:#3c3c3c"></div>
+            <div style="width:26px;height:22px;border:1px solid #8ecbff;border-radius:3px;background:#1c4a6e"></div>
+            <div style="width:26px;height:22px;border:1px solid #777;border-radius:3px;background:#3c3c3c"></div>
+          </div>
+          <div style="flex:1;border:1px solid #555;border-radius:3px;background:#101816;color:#7fe0b0;font:500 11px ui-monospace,Menlo,monospace;padding:5px 8px;display:flex;justify-content:space-between">
+            <span>05:12.4 / 06:40.0</span><span>SEC 3 · LOOP 2/3 · 80%</span>
+          </div>
+          <div style="width:52px;height:22px;border:1px solid #777;border-radius:3px;background:#3c3c3c"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:9px;letter-spacing:.1em;color:#bdbab4">SPEED</span>
+          <div style="flex:1;position:relative;height:26px">
+            <div style="position:absolute;top:11px;left:0;right:0;height:4px;border-radius:2px;background:#151515;border:1px solid #555"></div>
+            <div style="position:absolute;top:19px;left:0;right:0;display:flex;justify-content:space-between">
+              <div style="width:1px;height:6px;background:#777"></div><div style="width:1px;height:6px;background:#777"></div><div style="width:1px;height:6px;background:#777"></div><div style="width:1px;height:6px;background:#777"></div><div style="width:1px;height:6px;background:#777"></div><div style="width:1px;height:6px;background:#777"></div>
+            </div>
+            <div style="position:absolute;top:4px;left:58%;width:14px;height:20px;margin-left:-7px;border:1px solid #111;border-radius:3px;background:linear-gradient(#f2f0eb,#c9c6bf)"></div>
+          </div>
+          <span style="font:500 11px ui-monospace,Menlo,monospace;color:#7fe0b0;width:38px;text-align:right">80%</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:9px;letter-spacing:.1em;color:#bdbab4">GAP</span>
+          <div style="width:64px;height:20px;border:1px solid #555;border-radius:3px;background:#101816"></div>
+          <span style="font-size:9px;letter-spacing:.1em;color:#bdbab4;margin-left:8px">LOOPS</span>
+          <div style="width:44px;height:20px;border:1px solid #555;border-radius:3px;background:#101816"></div>
+          <div style="margin-left:auto;display:flex;gap:6px"><div style="width:30px;height:20px;border:1px solid #777;border-radius:3px;background:#3c3c3c"></div><div style="width:30px;height:20px;border:1px solid #777;border-radius:3px;background:#3c3c3c"></div></div>
+        </div>
+        <div style="position:relative;height:26px;border:1px solid #555;border-radius:3px;background:#1a1a1a;overflow:hidden">
+          <div style="position:absolute;left:6%;width:12%;top:3px;bottom:3px;border:1px solid #9ad;border-radius:2px;background:#25455c"></div>
+          <div style="position:absolute;left:22%;width:14%;top:3px;bottom:3px;border:1px solid #9ad;border-radius:2px;background:#25455c"></div>
+          <div style="position:absolute;left:40%;width:11%;top:3px;bottom:3px;border:1px solid #ffd479;border-radius:2px;background:#6b5420"></div>
+          <div style="position:absolute;left:56%;width:15%;top:3px;bottom:3px;border:1px solid #9ad;border-radius:2px;background:#25455c"></div>
+          <div style="position:absolute;left:76%;width:16%;top:3px;bottom:3px;border:1px solid #9ad;border-radius:2px;background:#25455c"></div>
+          <div style="position:absolute;left:45%;top:0;bottom:0;width:1.5px;background:#fff"></div>
+        </div>
+      </div>
+    </div>
+    <div style="width:196px;border:1.5px solid #333;border-radius:4px;background:#fff;display:flex;flex-direction:column">
+      <div style="padding:7px 9px;border-bottom:1.5px solid #333;display:flex;justify-content:space-between;align-items:center;background:#ecebe7"><span style="font:600 10px/1 'Space Grotesk';letter-spacing:.08em">SECTIONS</span><span style="font-size:14px;color:#555">+</span></div>
+      <div style="display:flex;align-items:center;gap:7px;padding:8px 9px;border-bottom:1px solid #ddd"><span style="width:12px;font:500 9px ui-monospace;color:#999">⋮⋮</span><div style="flex:1"><div style="font:500 11px 'Space Grotesk'">Section 1</div><div style="font:400 9px ui-monospace;color:#888">5:09.9 – 5:17.1</div></div><div style="width:20px;height:16px;border:1px solid #bbb;border-radius:2px"></div></div>
+      <div style="display:flex;align-items:center;gap:7px;padding:8px 9px;border-bottom:1px solid #ddd"><span style="width:12px;font:500 9px ui-monospace;color:#999">⋮⋮</span><div style="flex:1"><div style="font:500 11px 'Space Grotesk'">Section 2</div><div style="font:400 9px ui-monospace;color:#888">5:21.9 – 5:32.6</div></div><div style="width:20px;height:16px;border:1px solid #bbb;border-radius:2px"></div></div>
+      <div style="display:flex;align-items:center;gap:7px;padding:8px 9px;border-bottom:1px solid #ddd;background:#fff4d6;border-left:3px solid #e0a020"><span style="width:12px;font:500 9px ui-monospace;color:#999">⋮⋮</span><div style="flex:1"><div style="font:600 11px 'Space Grotesk'">Section 3</div><div style="font:400 9px ui-monospace;color:#8a6a1a">5:36.1 – 5:44.3</div></div><div style="width:20px;height:16px;border:1px solid #bbb;border-radius:2px;background:#fff"></div></div>
+      <div style="display:flex;align-items:center;gap:7px;padding:8px 9px;border-bottom:1px solid #ddd"><span style="width:12px;font:500 9px ui-monospace;color:#999">⋮⋮</span><div style="flex:1"><div style="font:500 11px 'Space Grotesk'">Section 4</div><div style="font:400 9px ui-monospace;color:#888">5:50.4 – 6:01.4</div></div><div style="width:20px;height:16px;border:1px solid #bbb;border-radius:2px"></div></div>
+      <div style="display:flex;align-items:center;gap:7px;padding:8px 9px"><span style="width:12px;font:500 9px ui-monospace;color:#999">⋮⋮</span><div style="flex:1"><div style="font:500 11px 'Space Grotesk'">Section 5</div><div style="font:400 9px ui-monospace;color:#888">6:05.1 – 6:16.8</div></div><div style="width:20px;height:16px;border:1px solid #bbb;border-radius:2px"></div></div>
+      <div style="margin-top:auto;padding:8px 9px;border-top:1.5px solid #333;font:400 9px 'Space Grotesk';color:#777">Drag to reorder · click to jump</div>
+    </div>
+  </div>
+  <div class="note" style="font-size:12px">Closest to GarageBand: dark transport strip with LCD readout, detented speed fader, arrange lane for sections.</div>
+</div>
+</div>
+
+<div class="dv-opt" id="1b">
+<div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Vertical fader rail, overlay transport on video</div>
+<div class="dv-card" style="width: 795px; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: #fafaf8; height: 332px">
+  <div style="display:flex;gap:10px;align-items:stretch">
+    <div style="width:64px;border:1.5px solid #333;border-radius:4px;background:#2b2b2b;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:8px">
+      <span style="font-size:8px;letter-spacing:.1em;color:#bdbab4">SPEED</span>
+      <div style="position:relative;width:26px;flex:1;min-height:150px">
+        <div style="position:absolute;left:11px;top:0;bottom:0;width:4px;border-radius:2px;background:#151515;border:1px solid #555"></div>
+        <div style="position:absolute;right:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end">
+          <span style="font:400 7px ui-monospace;color:#8f8c86">100</span><span style="font:400 7px ui-monospace;color:#8f8c86">90</span><span style="font:400 7px ui-monospace;color:#8f8c86">80</span><span style="font:400 7px ui-monospace;color:#8f8c86">70</span><span style="font:400 7px ui-monospace;color:#8f8c86">60</span><span style="font:400 7px ui-monospace;color:#8f8c86">50</span>
+        </div>
+        <div style="position:absolute;top:38%;left:2px;width:22px;height:13px;border:1px solid #111;border-radius:3px;background:linear-gradient(#f2f0eb,#c9c6bf)"></div>
+      </div>
+      <div style="font:500 10px ui-monospace;color:#7fe0b0">80%</div>
+      <div style="width:100%;height:1px;background:#555"></div>
+      <span style="font-size:8px;letter-spacing:.1em;color:#bdbab4">GAP</span>
+      <div style="width:36px;height:18px;border:1px solid #555;border-radius:3px;background:#101816"></div>
+      <span style="font-size:8px;letter-spacing:.1em;color:#bdbab4">LOOPS</span>
+      <div style="width:36px;height:18px;border:1px solid #555;border-radius:3px;background:#101816"></div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+      <div style="aspect-ratio:16/9;border:1.5px solid #333;border-radius:4px;background:#e6e4e0;position:relative;display:flex;align-items:center;justify-content:center">
+        <div style="width:0;height:0;border-left:20px solid #9a9791;border-top:13px solid transparent;border-bottom:13px solid transparent"></div>
+        <div style="position:absolute;left:8px;right:8px;bottom:8px;border-radius:5px;background:rgba(20,20,20,.86);padding:6px 8px;display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:4px"><div style="width:20px;height:18px;border:1px solid #777;border-radius:3px;background:#3c3c3c"></div><div style="width:20px;height:18px;border:1px solid #8ecbff;border-radius:3px;background:#1c4a6e"></div><div style="width:20px;height:18px;border:1px solid #777;border-radius:3px;background:#3c3c3c"></div></div>
+          <div style="flex:1;position:relative;height:16px;border:1px solid #555;border-radius:3px;background:#1a1a1a;overflow:hidden">
+            <div style="position:absolute;left:8%;width:12%;top:2px;bottom:2px;background:#25455c;border:1px solid #9ad;border-radius:2px"></div>
+            <div style="position:absolute;left:24%;width:14%;top:2px;bottom:2px;background:#25455c;border:1px solid #9ad;border-radius:2px"></div>
+            <div style="position:absolute;left:42%;width:12%;top:2px;bottom:2px;background:#6b5420;border:1px solid #ffd479;border-radius:2px"></div>
+            <div style="position:absolute;left:58%;width:15%;top:2px;bottom:2px;background:#25455c;border:1px solid #9ad;border-radius:2px"></div>
+            <div style="position:absolute;left:78%;width:14%;top:2px;bottom:2px;background:#25455c;border:1px solid #9ad;border-radius:2px"></div>
+            <div style="position:absolute;left:46%;top:0;bottom:0;width:1.5px;background:#fff"></div>
+          </div>
+          <span style="font:500 9px ui-monospace;color:#7fe0b0">5:12 / 6:40</span>
+        </div>
+      </div>
+      <div class="note" style="font-size:12px">Controls float over the video; only the section list and fader rail take layout space.</div>
+    </div>
+    <div style="width:168px;border:1.5px solid #333;border-radius:4px;background:#fff;display:flex;flex-direction:column">
+      <div style="padding:6px 8px;border-bottom:1.5px solid #333;background:#ecebe7;font:600 9px 'Space Grotesk';letter-spacing:.08em">SECTIONS</div>
+      <div style="padding:7px 8px;border-bottom:1px solid #ddd"><div style="font:500 10px 'Space Grotesk'">1 · Section 1</div><div style="font:400 8px ui-monospace;color:#888">7.2s · ×1</div></div>
+      <div style="padding:7px 8px;border-bottom:1px solid #ddd"><div style="font:500 10px 'Space Grotesk'">2 · Section 2</div><div style="font:400 8px ui-monospace;color:#888">10.7s · ×1</div></div>
+      <div style="padding:7px 8px;border-bottom:1px solid #ddd;background:#fff4d6"><div style="font:600 10px 'Space Grotesk'">3 · Section 3</div><div style="font:400 8px ui-monospace;color:#8a6a1a">8.2s · ×1</div></div>
+      <div style="padding:7px 8px;border-bottom:1px solid #ddd"><div style="font:500 10px 'Space Grotesk'">4 · Section 4</div><div style="font:400 8px ui-monospace;color:#888">11.0s · ×1</div></div>
+      <div style="padding:7px 8px"><div style="font:500 10px 'Space Grotesk'">5 · Section 5</div><div style="font:400 8px ui-monospace;color:#888">11.7s · ×1</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="dv-opt" id="1c">
+<div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Arrange view — full-width section track below</div>
+<div class="dv-card" style="width:680px;padding:16px;display:flex;flex-direction:column;gap:10px;background:#fafaf8">
+  <div style="display:flex;gap:12px">
+    <div style="width:300px;aspect-ratio:16/9;border:1.5px solid #333;border-radius:4px;background:#e6e4e0;display:flex;align-items:center;justify-content:center"><div style="width:0;height:0;border-left:20px solid #9a9791;border-top:13px solid transparent;border-bottom:13px solid transparent"></div></div>
+    <div style="flex:1;border:1.5px solid #333;border-radius:4px;background:#fff;display:flex;flex-direction:column">
+      <div style="padding:6px 9px;border-bottom:1.5px solid #333;background:#ecebe7;font:600 9px 'Space Grotesk';letter-spacing:.08em;display:flex;justify-content:space-between"><span>SECTIONS</span><span style="color:#777">EDIT</span></div>
+      <div style="display:grid;grid-template-columns:1fr auto auto;gap:0">
+        <div style="padding:6px 9px;border-bottom:1px solid #eee;font:500 10px 'Space Grotesk'">Section 1</div><div style="padding:6px;border-bottom:1px solid #eee;font:400 9px ui-monospace;color:#888">5:09.9</div><div style="padding:6px 9px;border-bottom:1px solid #eee;font:400 9px ui-monospace;color:#888">×1</div>
+        <div style="padding:6px 9px;border-bottom:1px solid #eee;font:500 10px 'Space Grotesk'">Section 2</div><div style="padding:6px;border-bottom:1px solid #eee;font:400 9px ui-monospace;color:#888">5:21.9</div><div style="padding:6px 9px;border-bottom:1px solid #eee;font:400 9px ui-monospace;color:#888">×1</div>
+        <div style="padding:6px 9px;border-bottom:1px solid #eee;font:600 10px 'Space Grotesk';background:#fff4d6">Section 3</div><div style="padding:6px;border-bottom:1px solid #eee;font:400 9px ui-monospace;color:#8a6a1a;background:#fff4d6">5:36.1</div><div style="padding:6px 9px;border-bottom:1px solid #eee;font:400 9px ui-monospace;color:#8a6a1a;background:#fff4d6">×1</div>
+        <div style="padding:6px 9px;border-bottom:1px solid #eee;font:500 10px 'Space Grotesk'">Section 4</div><div style="padding:6px;border-bottom:1px solid #eee;font:400 9px ui-monospace;color:#888">5:50.4</div><div style="padding:6px 9px;border-bottom:1px solid #eee;font:400 9px ui-monospace;color:#888">×1</div>
+        <div style="padding:6px 9px;font:500 10px 'Space Grotesk'">Section 5</div><div style="padding:6px;font:400 9px ui-monospace;color:#888">6:05.1</div><div style="padding:6px 9px;font:400 9px ui-monospace;color:#888">×1</div>
+      </div>
+    </div>
+  </div>
+  <div style="border:1.5px solid #333;border-radius:4px;background:#2b2b2b;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #444">
+      <div style="display:flex;gap:4px"><div style="width:24px;height:20px;border:1px solid #777;border-radius:3px;background:#3c3c3c"></div><div style="width:24px;height:20px;border:1px solid #8ecbff;border-radius:3px;background:#1c4a6e"></div><div style="width:24px;height:20px;border:1px solid #777;border-radius:3px;background:#3c3c3c"></div></div>
+      <div style="border:1px solid #555;border-radius:3px;background:#101816;color:#7fe0b0;font:500 10px ui-monospace;padding:4px 8px">5:12.4 · SEC 3 · ×2/3</div>
+      <div style="flex:1;display:flex;align-items:center;gap:8px;max-width:260px">
+        <span style="font-size:8px;letter-spacing:.1em;color:#bdbab4">SPEED</span>
+        <div style="flex:1;position:relative;height:22px">
+          <div style="position:absolute;top:9px;left:0;right:0;height:4px;border-radius:2px;background:#151515;border:1px solid #555"></div>
+          <div style="position:absolute;top:16px;left:0;right:0;display:flex;justify-content:space-between"><div style="width:1px;height:5px;background:#777"></div><div style="width:1px;height:5px;background:#777"></div><div style="width:1px;height:5px;background:#777"></div><div style="width:1px;height:5px;background:#777"></div><div style="width:1px;height:5px;background:#777"></div><div style="width:1px;height:5px;background:#777"></div></div>
+          <div style="position:absolute;top:3px;left:58%;width:12px;height:17px;margin-left:-6px;border:1px solid #111;border-radius:3px;background:linear-gradient(#f2f0eb,#c9c6bf)"></div>
+        </div>
+        <span style="font:500 10px ui-monospace;color:#7fe0b0">80%</span>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:6px"><div style="width:26px;height:20px;border:1px solid #777;border-radius:3px;background:#3c3c3c"></div><div style="width:26px;height:20px;border:1px solid #777;border-radius:3px;background:#3c3c3c"></div></div>
+    </div>
+    <div style="display:flex">
+      <div style="width:70px;border-right:1px solid #444;padding:8px;display:flex;flex-direction:column;gap:6px"><span style="font-size:8px;letter-spacing:.08em;color:#bdbab4">TRACK</span><span style="font:400 9px 'Space Grotesk';color:#8f8c86">Sections</span></div>
+      <div style="flex:1;padding:8px 10px;position:relative">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font:400 7px ui-monospace;color:#777">5:00</span><span style="font:400 7px ui-monospace;color:#777">5:20</span><span style="font:400 7px ui-monospace;color:#777">5:40</span><span style="font:400 7px ui-monospace;color:#777">6:00</span><span style="font:400 7px ui-monospace;color:#777">6:20</span></div>
+        <div style="position:relative;height:40px;border:1px solid #555;border-radius:3px;background:#1a1a1a">
+          <div style="position:absolute;left:5%;width:13%;top:4px;bottom:4px;border:1px solid #9ad;border-radius:3px;background:#25455c;font:500 8px 'Space Grotesk';color:#cfe6f5;padding:3px 4px">Sec 1</div>
+          <div style="position:absolute;left:21%;width:16%;top:4px;bottom:4px;border:1px solid #9ad;border-radius:3px;background:#25455c;font:500 8px 'Space Grotesk';color:#cfe6f5;padding:3px 4px">Sec 2</div>
+          <div style="position:absolute;left:40%;width:12%;top:4px;bottom:4px;border:1px solid #ffd479;border-radius:3px;background:#6b5420;font:600 8px 'Space Grotesk';color:#ffe9b8;padding:3px 4px">Sec 3</div>
+          <div style="position:absolute;left:56%;width:17%;top:4px;bottom:4px;border:1px solid #9ad;border-radius:3px;background:#25455c;font:500 8px 'Space Grotesk';color:#cfe6f5;padding:3px 4px">Sec 4</div>
+          <div style="position:absolute;left:77%;width:18%;top:4px;bottom:4px;border:1px solid #9ad;border-radius:3px;background:#25455c;font:500 8px 'Space Grotesk';color:#cfe6f5;padding:3px 4px">Sec 5</div>
+          <div style="position:absolute;left:45%;top:-6px;bottom:-6px;width:1.5px;background:#fff"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note" style="font-size:12px">Sections are draggable regions on a timeline track — resize the edges to retime, like an arrangement lane.</div>
+</div>
+</div>
+
+<div class="dv-opt" id="1d">
+<div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Inspector panel — per-section settings on the right</div>
+<div class="dv-card" style="width:620px;padding:16px;display:flex;flex-direction:column;gap:12px;background:#fafaf8">
+  <div style="display:flex;gap:12px;align-items:stretch">
+    <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+      <div style="aspect-ratio:16/9;border:1.5px solid #333;border-radius:4px;background:#e6e4e0;display:flex;align-items:center;justify-content:center"><div style="width:0;height:0;border-left:20px solid #9a9791;border-top:13px solid transparent;border-bottom:13px solid transparent"></div></div>
+      <div style="border:1.5px solid #333;border-radius:4px;background:#2b2b2b;padding:8px 10px;display:flex;align-items:center;gap:8px">
+        <div style="display:flex;gap:4px"><div style="width:22px;height:19px;border:1px solid #777;border-radius:3px;background:#3c3c3c"></div><div style="width:22px;height:19px;border:1px solid #8ecbff;border-radius:3px;background:#1c4a6e"></div><div style="width:22px;height:19px;border:1px solid #777;border-radius:3px;background:#3c3c3c"></div></div>
+        <div style="flex:1;position:relative;height:18px;border:1px solid #555;border-radius:3px;background:#1a1a1a;overflow:hidden">
+          <div style="position:absolute;left:6%;width:12%;top:2px;bottom:2px;background:#25455c;border:1px solid #9ad;border-radius:2px"></div>
+          <div style="position:absolute;left:22%;width:14%;top:2px;bottom:2px;background:#25455c;border:1px solid #9ad;border-radius:2px"></div>
+          <div style="position:absolute;left:40%;width:12%;top:2px;bottom:2px;background:#6b5420;border:1px solid #ffd479;border-radius:2px"></div>
+          <div style="position:absolute;left:56%;width:15%;top:2px;bottom:2px;background:#25455c;border:1px solid #9ad;border-radius:2px"></div>
+          <div style="position:absolute;left:76%;width:16%;top:2px;bottom:2px;background:#25455c;border:1px solid #9ad;border-radius:2px"></div>
+          <div style="position:absolute;left:44%;top:0;bottom:0;width:1.5px;background:#fff"></div>
+        </div>
+        <span style="font:500 9px ui-monospace;color:#7fe0b0">80%</span>
+      </div>
+    </div>
+    <div style="width:210px;border:1.5px solid #333;border-radius:4px;background:#fff;display:flex;flex-direction:column">
+      <div style="display:flex;border-bottom:1.5px solid #333;background:#ecebe7">
+        <div style="flex:1;padding:6px;text-align:center;font:600 9px 'Space Grotesk';background:#fff;border-right:1px solid #ccc">SECTIONS</div>
+        <div style="flex:1;padding:6px;text-align:center;font:500 9px 'Space Grotesk';color:#777">PRACTICE</div>
+      </div>
+      <div style="padding:6px 8px;border-bottom:1px solid #eee;font:500 10px 'Space Grotesk'">Section 1 <span style="float:right;font:400 8px ui-monospace;color:#999">×1</span></div>
+      <div style="padding:6px 8px;border-bottom:1px solid #eee;font:500 10px 'Space Grotesk'">Section 2 <span style="float:right;font:400 8px ui-monospace;color:#999">×1</span></div>
+      <div style="border-bottom:1px solid #ddd;background:#fff4d6">
+        <div style="padding:6px 8px;font:600 10px 'Space Grotesk'">Section 3 <span style="float:right;font:400 8px ui-monospace;color:#8a6a1a">×1</span></div>
+        <div style="padding:8px;display:flex;flex-direction:column;gap:7px;background:#fffaf0;border-top:1px dashed #d9bd7a">
+          <div style="display:flex;align-items:center;gap:6px"><span style="font:500 8px 'Space Grotesk';color:#666;width:34px">IN</span><div style="flex:1;height:18px;border:1px solid #bbb;border-radius:3px;background:#fff;font:400 8px ui-monospace;color:#555;padding:3px 5px">5:36.10</div><div style="display:flex;flex-direction:column;gap:1px"><div style="width:12px;height:8px;border:1px solid #bbb;border-radius:2px"></div><div style="width:12px;height:8px;border:1px solid #bbb;border-radius:2px"></div></div></div>
+          <div style="display:flex;align-items:center;gap:6px"><span style="font:500 8px 'Space Grotesk';color:#666;width:34px">OUT</span><div style="flex:1;height:18px;border:1px solid #bbb;border-radius:3px;background:#fff;font:400 8px ui-monospace;color:#555;padding:3px 5px">5:44.30</div><div style="display:flex;flex-direction:column;gap:1px"><div style="width:12px;height:8px;border:1px solid #bbb;border-radius:2px"></div><div style="width:12px;height:8px;border:1px solid #bbb;border-radius:2px"></div></div></div>
+          <div style="display:flex;align-items:center;gap:6px"><span style="font:500 8px 'Space Grotesk';color:#666;width:34px">SPEED</span><div style="flex:1;position:relative;height:16px"><div style="position:absolute;top:6px;left:0;right:0;height:3px;background:#ddd;border-radius:2px"></div><div style="position:absolute;top:11px;left:0;right:0;display:flex;justify-content:space-between"><div style="width:1px;height:4px;background:#bbb"></div><div style="width:1px;height:4px;background:#bbb"></div><div style="width:1px;height:4px;background:#bbb"></div><div style="width:1px;height:4px;background:#bbb"></div><div style="width:1px;height:4px;background:#bbb"></div></div><div style="position:absolute;top:1px;left:60%;width:10px;height:13px;margin-left:-5px;border:1px solid #666;border-radius:2px;background:#fff"></div></div><span style="font:400 8px ui-monospace;color:#555;width:26px;text-align:right">80%</span></div>
+          <div style="display:flex;align-items:center;gap:6px"><span style="font:500 8px 'Space Grotesk';color:#666;width:34px">REPS</span><div style="width:44px;height:18px;border:1px solid #bbb;border-radius:3px;background:#fff"></div><span style="font:500 8px 'Space Grotesk';color:#666;margin-left:6px">GAP</span><div style="width:44px;height:18px;border:1px solid #bbb;border-radius:3px;background:#fff"></div></div>
+        </div>
+      </div>
+      <div style="padding:6px 8px;border-bottom:1px solid #eee;font:500 10px 'Space Grotesk'">Section 4 <span style="float:right;font:400 8px ui-monospace;color:#999">×1</span></div>
+      <div style="padding:6px 8px;font:500 10px 'Space Grotesk'">Section 5 <span style="float:right;font:400 8px ui-monospace;color:#999">×1</span></div>
+    </div>
+  </div>
+  <div class="note" style="font-size:12px">Each section expands into its own inspector — per-section speed and rep count instead of one global setting.</div>
+</div>
+</div>
+
+<div class="dv-opt" id="1e">
+<div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Narrow / mobile — stacked, chunky touch controls</div>
+<div class="dv-card" style="width:330px;padding:14px;display:flex;flex-direction:column;gap:10px;background:#fafaf8">
+  <div style="aspect-ratio:16/9;border:1.5px solid #333;border-radius:4px;background:#e6e4e0;display:flex;align-items:center;justify-content:center"><div style="width:0;height:0;border-left:18px solid #9a9791;border-top:12px solid transparent;border-bottom:12px solid transparent"></div></div>
+  <div style="position:relative;height:22px;border:1.5px solid #333;border-radius:3px;background:#efeee9;overflow:hidden">
+    <div style="position:absolute;left:6%;width:12%;top:3px;bottom:3px;background:#cfe0ee;border:1px solid #7fa4c4;border-radius:2px"></div>
+    <div style="position:absolute;left:22%;width:14%;top:3px;bottom:3px;background:#cfe0ee;border:1px solid #7fa4c4;border-radius:2px"></div>
+    <div style="position:absolute;left:40%;width:12%;top:3px;bottom:3px;background:#ffd479;border:1px solid #c79b2e;border-radius:2px"></div>
+    <div style="position:absolute;left:56%;width:15%;top:3px;bottom:3px;background:#cfe0ee;border:1px solid #7fa4c4;border-radius:2px"></div>
+    <div style="position:absolute;left:76%;width:16%;top:3px;bottom:3px;background:#cfe0ee;border:1px solid #7fa4c4;border-radius:2px"></div>
+    <div style="position:absolute;left:44%;top:0;bottom:0;width:2px;background:#c1440e"></div>
+  </div>
+  <div style="border:1.5px solid #333;border-radius:5px;background:#2b2b2b;padding:10px;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;gap:8px;justify-content:center">
+      <div style="width:46px;height:38px;border:1px solid #777;border-radius:5px;background:#3c3c3c"></div>
+      <div style="width:56px;height:38px;border:1px solid #8ecbff;border-radius:5px;background:#1c4a6e"></div>
+      <div style="width:46px;height:38px;border:1px solid #777;border-radius:5px;background:#3c3c3c"></div>
+      <div style="width:46px;height:38px;border:1px solid #777;border-radius:5px;background:#3c3c3c"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:9px;letter-spacing:.08em;color:#bdbab4">SPEED</span>
+      <div style="flex:1;position:relative;height:28px">
+        <div style="position:absolute;top:12px;left:0;right:0;height:5px;border-radius:3px;background:#151515;border:1px solid #555"></div>
+        <div style="position:absolute;top:20px;left:0;right:0;display:flex;justify-content:space-between"><div style="width:1px;height:6px;background:#777"></div><div style="width:1px;height:6px;background:#777"></div><div style="width:1px;height:6px;background:#777"></div><div style="width:1px;height:6px;background:#777"></div><div style="width:1px;height:6px;background:#777"></div><div style="width:1px;height:6px;background:#777"></div></div>
+        <div style="position:absolute;top:3px;left:58%;width:18px;height:24px;margin-left:-9px;border:1px solid #111;border-radius:4px;background:linear-gradient(#f2f0eb,#c9c6bf)"></div>
+      </div>
+      <span style="font:500 11px ui-monospace;color:#7fe0b0;width:36px;text-align:right">80%</span>
+    </div>
+  </div>
+  <div style="border:1.5px solid #333;border-radius:4px;background:#fff">
+    <div style="padding:7px 9px;border-bottom:1.5px solid #333;background:#ecebe7;font:600 9px 'Space Grotesk';letter-spacing:.08em;display:flex;justify-content:space-between"><span>SECTIONS</span><span style="color:#777">＋</span></div>
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 9px;border-bottom:1px solid #eee"><div style="width:22px;height:22px;border:1px solid #bbb;border-radius:11px;font:500 9px ui-monospace;color:#777;display:flex;align-items:center;justify-content:center">1</div><div style="flex:1;font:500 11px 'Space Grotesk'">Section 1</div><span style="font:400 9px ui-monospace;color:#888">7.2s</span></div>
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 9px;border-bottom:1px solid #eee"><div style="width:22px;height:22px;border:1px solid #bbb;border-radius:11px;font:500 9px ui-monospace;color:#777;display:flex;align-items:center;justify-content:center">2</div><div style="flex:1;font:500 11px 'Space Grotesk'">Section 2</div><span style="font:400 9px ui-monospace;color:#888">10.7s</span></div>
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 9px;border-bottom:1px solid #eee;background:#fff4d6"><div style="width:22px;height:22px;border:1px solid #c79b2e;border-radius:11px;background:#ffd479;font:600 9px ui-monospace;color:#5a4410;display:flex;align-items:center;justify-content:center">3</div><div style="flex:1;font:600 11px 'Space Grotesk'">Section 3</div><span style="font:400 9px ui-monospace;color:#8a6a1a">8.2s</span></div>
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 9px;border-bottom:1px solid #eee"><div style="width:22px;height:22px;border:1px solid #bbb;border-radius:11px;font:500 9px ui-monospace;color:#777;display:flex;align-items:center;justify-content:center">4</div><div style="flex:1;font:500 11px 'Space Grotesk'">Section 4</div><span style="font:400 9px ui-monospace;color:#888">11.0s</span></div>
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 9px"><div style="width:22px;height:22px;border:1px solid #bbb;border-radius:11px;font:500 9px ui-monospace;color:#777;display:flex;align-items:center;justify-content:center">5</div><div style="flex:1;font:500 11px 'Space Grotesk'">Section 5</div><span style="font:400 9px ui-monospace;color:#888">11.7s</span></div>
+  </div>
+  <div class="note" style="font-size:12px">Phone case: list below, 44px targets, section bar as its own strip under the video.</div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "build out <a class="dv-oid" href="#1a">1a</a> in full detail" · "combine <a class="dv-oid" href="#1c">1c</a>'s track with <a class="dv-oid" href="#1d">1d</a>'s inspector" · "more speed-control variants"</p>
+</section>
+
+</x-dc>
+</body>
+</html>
