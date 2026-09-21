@@ -155,7 +155,7 @@ section like `nudge`):
 
 | Command | Behaviour |
 |---|---|
-| `tapTempo()` | Adds a tap at `now() / player.rate()`. When `bpmFromTaps` returns a value, sets the section's `bpm` and shows notice `♩ <bpm>`; with fewer taps shows `♩ tap ×N`. No section → notice "Select a section first". |
+| `tapTempo()` | Adds a tap at `now() × player.rate()`. When `bpmFromTaps` returns a value, sets the section's `bpm` and shows notice `♩ <bpm>`; with fewer taps shows `♩ tap ×N`. No section → notice "Select a section first". |
 | `setBpm(n)` | Sets `bpm` (normalised). |
 | `nudgeBpm(±1)` | `bpm ± 1`, ignored when `bpm` is 0. |
 | `setBeatsPerBar(n)` | Sets meter. |
