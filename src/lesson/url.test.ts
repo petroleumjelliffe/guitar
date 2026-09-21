@@ -4,7 +4,7 @@ import { decodeLesson, encodeLesson } from './url';
 
 const ID = 'dQw4w9WgXcQ';
 const sec = (over: Partial<Section> = {}): Section => ({
-  id: 'x', name: 'Intro riff', start: 72, end: 94, rate: 0.75, ...over,
+  id: 'x', name: 'Intro riff', start: 72, end: 94, rate: 0.75, bpm: 0, beatsPerBar: 4, ...over,
 });
 
 describe('encodeLesson', () => {
@@ -30,8 +30,8 @@ describe('decodeLesson', () => {
     expect(r.lesson.videoId).toBe(ID);
     expect(r.lesson.updatedAt).toBe(999);
     expect(r.lesson.sections.map(({ id: _id, ...rest }) => rest)).toEqual([
-      { name: 'Intro riff', start: 72, end: 94, rate: 0.75 },
-      { name: 'Solo, bars 5&8 = 100% 🎸', start: 220, end: 242, rate: 0.5 },
+      { name: 'Intro riff', start: 72, end: 94, rate: 0.75, bpm: 0, beatsPerBar: 4 },
+      { name: 'Solo, bars 5&8 = 100% 🎸', start: 220, end: 242, rate: 0.5, bpm: 0, beatsPerBar: 4 },
     ]);
     expect(r.lesson.sections[0]!.id).not.toBe(r.lesson.sections[1]!.id);
   });

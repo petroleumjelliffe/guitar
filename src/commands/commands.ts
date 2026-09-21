@@ -1,6 +1,6 @@
 import type { Library } from '../lesson/library';
 import {
-  createLesson, newId, nudge as nudgeSection, removeSection, roundTime, snapRate, upsertSection,
+  createLesson, createSection, nudge as nudgeSection, removeSection, roundTime, snapRate, upsertSection,
   type Lesson, type Section,
 } from '../lesson/model';
 import { decodeLesson, encodeLesson } from '../lesson/url';
@@ -326,9 +326,9 @@ export function createCommands(ctx: CommandContext) {
       const end = roundTime(session.player.currentTime());
       const pending = store.pendingStart.value;
       if (pending !== null) {
-        const section: Section = {
-          id: newId(), name: `Section ${l.sections.length + 1}`, start: pending, end, rate: session.player.rate(),
-        };
+        const section = createSection({
+          name: `Section ${l.sections.length + 1}`, start: pending, end, rate: session.player.rate(),
+        });
         updateLesson(upsertSection(l, section, ctx.now()));
         store.pendingStart.value = null;
         commands.jumpToSectionId(section.id);

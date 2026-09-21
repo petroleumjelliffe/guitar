@@ -61,7 +61,7 @@ describe('openFromHash', () => {
     expect(store.error.value).toMatch(/invalid/i);
   });
   test('loads the link and flags when it differs from the saved copy', () => {
-    library.save(upsertSection(createLesson(ID, 'Saved'), { id: 'a', name: 'A', start: 0, end: 5, rate: 1 }));
+    library.save(upsertSection(createLesson(ID, 'Saved'), { id: 'a', name: 'A', start: 0, end: 5, rate: 1, bpm: 0, beatsPerBar: 4 }));
     expect(commands.openFromHash(`#v=1&id=${ID}&g=2`)).toBe(true);
     expect(store.lesson.value?.gap).toBe(2);
     expect(store.lesson.value?.title).toBe('Saved');
@@ -81,7 +81,7 @@ describe('openFromHash', () => {
     expect(store.linkDiffers.value).toBe(false);
   });
   test('attaching a player does not overwrite the saved copy; restoreSaved still works', () => {
-    library.save(upsertSection(createLesson(ID, 'Saved'), { id: 'a', name: 'A', start: 0, end: 5, rate: 1 }));
+    library.save(upsertSection(createLesson(ID, 'Saved'), { id: 'a', name: 'A', start: 0, end: 5, rate: 1, bpm: 0, beatsPerBar: 4 }));
     commands.openFromHash(`#v=1&id=${ID}&g=2`);
     commands.attachPlayer(player, 'Real title');
     vi.advanceTimersByTime(300);
@@ -200,7 +200,7 @@ describe('shareUrl / playerError', () => {
 function openWithPlayer(sections: Array<[string, number, number, number?]> = []) {
   let l = createLesson(ID, 'T', 1);
   for (const [name, start, end, rate] of sections) {
-    l = upsertSection(l, { id: name.toLowerCase(), name, start, end, rate: rate ?? 1 }, 1);
+    l = upsertSection(l, { id: name.toLowerCase(), name, start, end, rate: rate ?? 1, bpm: 0, beatsPerBar: 4 }, 1);
   }
   library.save(l);
   commands.openLesson(ID);

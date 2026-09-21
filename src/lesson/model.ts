@@ -1,18 +1,27 @@
+export const BPM_MIN = 30;
+export const BPM_MAX = 300;
+export const BEATS_PER_BAR_OPTIONS = [2, 3, 4, 6] as const;
+export type BeatsPerBar = (typeof BEATS_PER_BAR_OPTIONS)[number];
+export type CountIn = 0 | 1 | 2;
+
 export interface Section {
   id: string;
   name: string;
-  start: number; // seconds, one decimal
-  end: number;   // seconds, one decimal
-  rate: number;  // playback rate applied when activated
+  start: number;         // seconds, one decimal
+  end: number;           // seconds, one decimal
+  rate: number;          // playback rate applied when activated
+  bpm: number;           // 0 = no tempo; else integer in [BPM_MIN, BPM_MAX]
+  beatsPerBar: BeatsPerBar;
 }
 
 export interface Lesson {
   v: 1;
   videoId: string;
   title: string;
-  sections: Section[]; // sorted by start
-  gap: number;         // seconds of pause between loop repeats
-  updatedAt: number;   // epoch ms
+  sections: Section[];   // sorted by start
+  gap: number;           // seconds of pause between repeats when a section has no tempo
+  countIn: CountIn;      // bars of count-in for sections with a tempo
+  updatedAt: number;     // epoch ms
 }
 
 export const MIN_SECTION_LENGTH = 0.2;
@@ -29,7 +38,7 @@ export function newId(): string {
 }
 
 export function createLesson(videoId: string, title = videoId, now = Date.now()): Lesson {
-  return { v: 1, videoId, title, sections: [], gap: 0, updatedAt: now };
+  return { v: 1, videoId, title, sections: [], gap: 0, countIn: 1, updatedAt: now };
 }
 
 export function snapRate(rate: number, available: number[]): number {
@@ -40,10 +49,25 @@ export function snapRate(rate: number, available: number[]): number {
   return best;
 }
 
+/** 0 means "no tempo"; anything positive is rounded and clamped. */
+export function normalizeBpm(bpm: number): number {
+  if (!Number.isFinite(bpm) || bpm <= 0) return 0;
+  return Math.min(BPM_MAX, Math.max(BPM_MIN, Math.round(bpm)));
+}
+
+export function normalizeBeatsPerBar(n: number): BeatsPerBar {
+  return (BEATS_PER_BAR_OPTIONS as readonly number[]).includes(n) ? (n as BeatsPerBar) : 4;
+}
+
 export function normalizeSection(s: Section): Section {
   const start = roundTime(Math.max(0, s.start));
   const end = Math.max(roundTime(s.end), roundTime(start + MIN_SECTION_LENGTH));
-  return { ...s, start, end };
+  return { ...s, start, end, bpm: normalizeBpm(s.bpm), beatsPerBar: normalizeBeatsPerBar(s.beatsPerBar) };
+}
+
+/** Build a section with a fresh id and tempo defaults, then normalise it. */
+export function createSection(fields: Pick<Section, 'name' | 'start' | 'end' | 'rate'> & Partial<Section>): Section {
+  return normalizeSection({ id: newId(), bpm: 0, beatsPerBar: 4, ...fields });
 }
 
 export function sortSections(sections: Section[]): Section[] {

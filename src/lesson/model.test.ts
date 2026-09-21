@@ -1,11 +1,12 @@
 import { describe, expect, test } from 'vitest';
 import {
-  DEFAULT_RATES, MIN_SECTION_LENGTH, createLesson, formatTime, normalizeSection, nudge,
-  removeSection, roundTime, snapRate, sortSections, upsertSection, type Section,
+  DEFAULT_RATES, MIN_SECTION_LENGTH, createLesson, createSection, formatTime, normalizeBeatsPerBar, normalizeBpm,
+  normalizeSection, nudge, removeSection, roundTime, snapRate, sortSections, upsertSection,
+  type BeatsPerBar, type Section,
 } from './model';
 
 const sec = (over: Partial<Section> = {}): Section => ({
-  id: 'a', name: 'A', start: 10, end: 20, rate: 1, ...over,
+  id: 'a', name: 'A', start: 10, end: 20, rate: 1, bpm: 0, beatsPerBar: 4, ...over,
 });
 
 describe('roundTime', () => {
@@ -84,5 +85,37 @@ describe('formatTime', () => {
     expect(formatTime(72.34)).toBe('1:12.3');
     expect(formatTime(5)).toBe('0:05.0');
     expect(formatTime(3600)).toBe('60:00.0');
+  });
+});
+
+describe('tempo fields', () => {
+  test('normalizeBpm keeps 0, clamps and rounds positive values, zeroes garbage', () => {
+    expect(normalizeBpm(0)).toBe(0);
+    expect(normalizeBpm(119.6)).toBe(120);
+    expect(normalizeBpm(10)).toBe(30);
+    expect(normalizeBpm(999)).toBe(300);
+    expect(normalizeBpm(-5)).toBe(0);
+    expect(normalizeBpm(Number.NaN)).toBe(0);
+  });
+  test('normalizeBeatsPerBar accepts 2/3/4/6 and defaults to 4', () => {
+    expect(normalizeBeatsPerBar(3)).toBe(3);
+    expect(normalizeBeatsPerBar(6)).toBe(6);
+    expect(normalizeBeatsPerBar(5)).toBe(4);
+    expect(normalizeBeatsPerBar(0)).toBe(4);
+  });
+  test('normalizeSection applies both', () => {
+    const s = normalizeSection(sec({ bpm: 400, beatsPerBar: 7 as BeatsPerBar }));
+    expect(s.bpm).toBe(300);
+    expect(s.beatsPerBar).toBe(4);
+  });
+  test('createSection fills id and tempo defaults', () => {
+    const s = createSection({ name: 'Riff', start: 1, end: 2, rate: 1 });
+    expect(s.id).toMatch(/^[a-z0-9]{6}$/);
+    expect(s.bpm).toBe(0);
+    expect(s.beatsPerBar).toBe(4);
+    expect(createSection({ name: 'R', start: 1, end: 2, rate: 1, bpm: 90, beatsPerBar: 3 })).toMatchObject({ bpm: 90, beatsPerBar: 3 });
+  });
+  test('createLesson defaults countIn to 1', () => {
+    expect(createLesson('dQw4w9WgXcQ').countIn).toBe(1);
   });
 });

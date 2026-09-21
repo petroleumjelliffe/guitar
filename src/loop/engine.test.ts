@@ -3,7 +3,7 @@ import { FakePlayer } from '../player/fake';
 import type { Section } from '../lesson/model';
 import { LoopEngine } from './engine';
 
-const section: Section = { id: 's1', name: 'Riff', start: 10, end: 20, rate: 0.75 };
+const section: Section = { id: 's1', name: 'Riff', start: 10, end: 20, rate: 0.75, bpm: 0, beatsPerBar: 4 };
 
 let player: FakePlayer;
 let clock: number;

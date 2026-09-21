@@ -26,7 +26,7 @@ describe('Library', () => {
   test('list is newest first with counts', () => {
     const lib = new Library(new MemStorage());
     lib.save(createLesson('aaaaaaaaaaa', 'Old', 1));
-    lib.save({ ...createLesson('bbbbbbbbbbb', 'New', 2), sections: [{ id: 'x', name: 'S', start: 0, end: 1, rate: 1 }] });
+    lib.save({ ...createLesson('bbbbbbbbbbb', 'New', 2), sections: [{ id: 'x', name: 'S', start: 0, end: 1, rate: 1, bpm: 0, beatsPerBar: 4 }] });
     expect(lib.list()).toEqual([
       { videoId: 'bbbbbbbbbbb', title: 'New', sectionCount: 1, updatedAt: 2 },
       { videoId: 'aaaaaaaaaaa', title: 'Old', sectionCount: 0, updatedAt: 1 },

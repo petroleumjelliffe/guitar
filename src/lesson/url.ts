@@ -52,11 +52,11 @@ export function decodeLesson(hash: string, now = Date.now()): DecodeResult {
     if (![start, end, rate].every(Number.isFinite) || end <= start || rate <= 0) {
       return fail('Bad section');
     }
-    sections.push(normalizeSection({ id: newId(), name, start, end, rate }));
+    sections.push(normalizeSection({ id: newId(), name, start, end, rate, bpm: 0, beatsPerBar: 4 }));
   }
 
   return {
     ok: true,
-    lesson: { v: 1, videoId, title: videoId, sections: sortSections(sections), gap, updatedAt: now },
+    lesson: { v: 1, videoId, title: videoId, sections: sortSections(sections), gap, countIn: 1, updatedAt: now },
   };
 }
