@@ -8,4 +8,7 @@ export class FakeClicker implements ClickerPort {
   stop() {
     this.calls.push('stop');
   }
+  prime() {
+    this.calls.push('prime');
+  }
 }

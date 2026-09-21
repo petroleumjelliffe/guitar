@@ -47,11 +47,12 @@ export class WebAudioClicker implements ClickerPort {
     // audio must never throw into it. If something fails mid-schedule, stop()
     // cancels any partial schedule and prevents half-configured oscillators.
     try {
-      if (ctx.state === 'suspended') {
-        // The clock is frozen while suspended: reading ctx.currentTime now
-        // would anchor the schedule to a stale time and every click would
-        // land late by the resume latency. Schedule only once resume()
-        // resolves and the audio clock is live again.
+      if (ctx.state !== 'running') {
+        // Covers 'suspended' and Safari's non-standard 'interrupted' (set
+        // after a hidden tab or laptop sleep). The clock is frozen in both:
+        // reading ctx.currentTime now would anchor the schedule to a stale
+        // time and every click would land late or never play. Schedule only
+        // once resume() resolves and the audio clock is live again.
         void ctx
           .resume()
           .then(() => {
@@ -95,6 +96,16 @@ export class WebAudioClicker implements ClickerPort {
       }
     } catch {
       this.stop();
+    }
+  }
+
+  prime(): void {
+    try {
+      const ctx = this.context();
+      if (!ctx || ctx.state === 'running') return;
+      void ctx.resume().catch(() => undefined);
+    } catch {
+      // Web Audio unavailable; count-ins stay silent.
     }
   }
 

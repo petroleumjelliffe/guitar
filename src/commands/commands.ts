@@ -258,12 +258,14 @@ export function createCommands(ctx: CommandContext) {
 
     togglePlay() {
       if (!session) return;
+      session.engine.clicker?.prime();
       session.player.state() === 'playing' ? session.player.pause() : session.player.play();
     },
 
     jumpToSectionId(id: string) {
       const s = sections().find((x) => x.id === id);
       if (!s || !session) return;
+      session.engine.clicker?.prime();
       store.selectedSectionId.value = id;
       session.engine.activate(s);
     },
@@ -274,8 +276,12 @@ export function createCommands(ctx: CommandContext) {
     },
 
     restartSection() {
-      if (activeSection()) session?.engine.restart();
-      else commands.jumpToSection(1);
+      if (activeSection()) {
+        session?.engine.clicker?.prime();
+        session?.engine.restart();
+      } else {
+        commands.jumpToSection(1);
+      }
     },
 
     nextSection() {
@@ -294,6 +300,7 @@ export function createCommands(ctx: CommandContext) {
     },
 
     toggleLoop() {
+      session?.engine.clicker?.prime();
       session?.engine.toggleLoop();
     },
 

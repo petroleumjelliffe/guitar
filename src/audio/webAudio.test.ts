@@ -21,8 +21,9 @@ interface FakeGain {
 }
 
 interface FakeAudioContext {
-  state: 'running' | 'suspended';
+  state: 'running' | 'suspended' | 'interrupted';
   currentTime: number;
+  resumeCalls: number;
   oscillators: FakeOscillator[];
   destination: object;
   resume(): Promise<void>;
@@ -30,13 +31,15 @@ interface FakeAudioContext {
   createGain(): FakeGain;
 }
 
-function makeFakeContext(state: 'running' | 'suspended', currentTime: number): FakeAudioContext {
+function makeFakeContext(state: 'running' | 'suspended' | 'interrupted', currentTime: number): FakeAudioContext {
   const ctx: FakeAudioContext = {
     state,
     currentTime,
+    resumeCalls: 0,
     oscillators: [],
     destination: {},
     resume() {
+      ctx.resumeCalls++;
       ctx.state = 'running';
       return Promise.resolve();
     },
@@ -119,6 +122,50 @@ describe('WebAudioClicker', () => {
     await Promise.resolve();
 
     expect(ctx.oscillators.map((o) => o.starts[0])).toEqual([5.3, 5.8, 6.3, 6.8]);
+  });
+
+  test("Safari's non-standard 'interrupted' state is treated like suspended (e.g. after laptop sleep)", async () => {
+    const ctx = makeFakeContext('interrupted', 5);
+    installWindow(() => ctx);
+    let now = 700;
+    const clicker = new WebAudioClicker(() => now);
+
+    clicker.countIn(120, 4, 4, 1000);
+    expect(ctx.oscillators).toHaveLength(0);
+    expect(ctx.resumeCalls).toBe(1);
+
+    ctx.currentTime = 5.3;
+    now = 1000;
+    await Promise.resolve();
+
+    expect(ctx.oscillators.map((o) => o.starts[0])).toEqual([5.3, 5.8, 6.3, 6.8]);
+  });
+
+  test('prime() creates the context and resumes it when it is not running', () => {
+    const ctx = makeFakeContext('interrupted', 0);
+    let created = 0;
+    installWindow(() => {
+      created++;
+      return ctx;
+    });
+    const clicker = new WebAudioClicker(() => 0);
+
+    clicker.prime();
+    expect(created).toBe(1);
+    expect(ctx.resumeCalls).toBe(1);
+    expect(ctx.state).toBe('running');
+
+    clicker.prime();
+    expect(created).toBe(1); // reused
+    expect(ctx.resumeCalls).toBe(1); // already running: no resume
+  });
+
+  test('prime() never throws when Web Audio is unavailable', () => {
+    installWindow(() => {
+      throw new Error('no audio');
+    });
+    const clicker = new WebAudioClicker(() => 0);
+    expect(() => clicker.prime()).not.toThrow();
   });
 
   test('a beat whose scheduled time has already passed is skipped, not played late', () => {

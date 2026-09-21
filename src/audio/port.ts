@@ -8,4 +8,11 @@ export interface ClickerPort {
   countIn(bpm: number, beats: number, beatsPerBar: number, startAtMs: number): void;
   /** Cancel any clicks not yet played. */
   stop(): void;
+  /**
+   * Call from a user gesture (play, restart, loop…). Creates the audio
+   * context if needed and resumes it when it is not running. Safari only
+   * lets a context recover from an interruption (tab hidden, laptop sleep)
+   * inside a gesture; the engine's tick is not one.
+   */
+  prime(): void;
 }

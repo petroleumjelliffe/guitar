@@ -386,6 +386,20 @@ describe('marking and editing', () => {
   });
 });
 
+describe('audio priming from gestures', () => {
+  test.each([
+    ['togglePlay', () => commands.togglePlay(), ['prime']],
+    ['toggleLoop', () => commands.toggleLoop(), ['prime', 'stop']],
+    ['jumpToSection', () => commands.jumpToSection(1), ['prime', 'stop']],
+    ['restartSection (active)', () => { commands.jumpToSection(1); clicker.calls = []; commands.restartSection(); }, ['prime', 'stop']],
+  ])('%s primes the clicker so Safari can resume audio inside a user gesture', (_name, act, expected) => {
+    openWithPlayer([['A', 10, 20]]);
+    clicker.calls = [];
+    act();
+    expect(clicker.calls).toEqual(expected);
+  });
+});
+
 describe('tempo commands', () => {
   test('attachPlayer gives the engine the clicker and the lesson count-in; detach stops clicks', () => {
     library.save({ ...createLesson(ID), countIn: 2 });
