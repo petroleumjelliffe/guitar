@@ -34,6 +34,10 @@ export class WebAudioClicker implements ClickerPort {
   countIn(bpm: number, beats: number, beatsPerBar: number, startAtMs: number): void {
     const ctx = this.context();
     if (!ctx || bpm <= 0 || beats <= 0) return;
+    if (import.meta.env.DEV) {
+      // Diagnostic: state of the audio clock at each count-in (dev builds only).
+      console.debug('[clicker] countIn', { state: ctx.state, currentTime: ctx.currentTime, bpm, beats });
+    }
     // Clear any previously pending schedule either way (synchronous path or
     // a still-resolving resume from an earlier call).
     this.stop();
