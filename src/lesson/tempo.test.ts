@@ -13,6 +13,9 @@ describe('tap', () => {
   test('keeps a pause of exactly TAP_RESET_MS', () => {
     expect(tapAll([0, TAP_RESET_MS]).taps).toEqual([0, TAP_RESET_MS]);
   });
+  test('resets when a rate decrease makes the next tap time jump backwards', () => {
+    expect(tapAll([10000, 10500, 11000, 3000]).taps).toEqual([3000]);
+  });
   test('keeps at most MAX_TAPS, dropping the oldest', () => {
     const times = Array.from({ length: MAX_TAPS + 3 }, (_, i) => i * 500);
     const s = tapAll(times);

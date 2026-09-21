@@ -19,6 +19,36 @@ interface LibraryData {
   lessons: Record<string, Lesson>;
 }
 
+function isValidSection(s: unknown): boolean {
+  if (typeof s !== 'object' || s === null) return false;
+  const sec = s as Record<string, unknown>;
+  return (
+    typeof sec.id === 'string' &&
+    typeof sec.name === 'string' &&
+    typeof sec.start === 'number' &&
+    typeof sec.end === 'number' &&
+    typeof sec.rate === 'number' &&
+    typeof sec.bpm === 'number' &&
+    typeof sec.beatsPerBar === 'number'
+  );
+}
+
+/** A stored lesson missing the count-in-era fields (spec §3) is invalid and dropped. */
+export function isValidLesson(l: unknown): l is Lesson {
+  if (typeof l !== 'object' || l === null) return false;
+  const lesson = l as Record<string, unknown>;
+  return (
+    lesson.v === 1 &&
+    typeof lesson.videoId === 'string' &&
+    typeof lesson.title === 'string' &&
+    typeof lesson.gap === 'number' &&
+    (lesson.countIn === 0 || lesson.countIn === 1 || lesson.countIn === 2) &&
+    typeof lesson.updatedAt === 'number' &&
+    Array.isArray(lesson.sections) &&
+    lesson.sections.every(isValidSection)
+  );
+}
+
 export class Library {
   private data: LibraryData = { v: 1, lessons: {} };
   unavailable = false;
@@ -34,7 +64,13 @@ export class Library {
         const parsed = JSON.parse(raw) as LibraryData;
         const lessons: unknown = parsed?.lessons;
         const hasLessonsMap = typeof lessons === 'object' && lessons !== null && !Array.isArray(lessons);
-        if (parsed && parsed.v === 1 && hasLessonsMap) this.data = parsed;
+        if (parsed && parsed.v === 1 && hasLessonsMap) {
+          const valid: Record<string, Lesson> = {};
+          for (const [key, value] of Object.entries(lessons as Record<string, unknown>)) {
+            if (isValidLesson(value)) valid[key] = value;
+          }
+          this.data = { v: 1, lessons: valid };
+        }
       }
     } catch {
       // Corrupt or unreadable: start empty. Writing will still be attempted.
@@ -57,7 +93,7 @@ export class Library {
 
   list(): LessonSummary[] {
     return Object.values(this.data.lessons)
-      .filter((l): l is Lesson => !!l && typeof l.videoId === 'string' && Array.isArray(l.sections))
+      .filter(isValidLesson)
       .map((l) => ({ videoId: l.videoId, title: l.title, sectionCount: l.sections.length, updatedAt: l.updatedAt }))
       .sort((a, b) => b.updatedAt - a.updatedAt);
   }

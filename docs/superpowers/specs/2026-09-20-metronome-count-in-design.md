@@ -67,9 +67,9 @@ or 2 (`Bad count-in`).
 ### Library
 
 Same shape, new fields carried as-is. No migration: a stored lesson
-missing the fields is invalid and is treated like any other malformed
-entry (dropped by `list()`'s guard). The author accepts losing the
-current alpha library.
+missing the new fields is invalid and is dropped when the library loads
+(`Library` constructor), so it never reaches `get()`/`list()`. The
+author accepts losing the current alpha library.
 
 ## 4. Tap tempo (`src/lesson/tempo.ts`, pure)
 
@@ -106,9 +106,11 @@ like `FakePlayer`).
 
 - Creates one `AudioContext` lazily on first `countIn` (a user gesture
   has always happened by then: the loop only runs after Play). If the
-  context is `suspended`, call `resume()` and proceed.
+  context is `suspended`, `resume()` it and schedule the clicks only
+  once it resolves, reading the audio clock afresh; beats already in
+  the past are skipped.
 - Maps engine time to audio time once per call:
-  `audioStart = ctx.currentTime + max(0, (startAtMs - now()) / 1000)`.
+  `audioStart = ctx.currentTime + (startAtMs - now()) / 1000`.
 - Each click: an `OscillatorNode` (sine) into a `GainNode`, 1000 Hz for
   normal beats, 1500 Hz for the accent, 30 ms with a 5 ms decay,
   scheduled with `start(t)`/`stop(t + 0.03)`. Nodes are kept in a list
@@ -116,6 +118,8 @@ like `FakePlayer`).
 - Failure (no Web Audio, or `resume()` rejected): swallow and do
   nothing; the count-in still times out silently. Never throw into the
   engine.
+- One `WebAudioClicker` instance per page; `app.ts` creates it once and
+  `createClicker` returns it.
 
 ## 6. Loop engine changes (`src/loop/engine.ts`)
 

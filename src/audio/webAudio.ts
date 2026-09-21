@@ -14,6 +14,7 @@ type AudioContextCtor = typeof AudioContext;
 export class WebAudioClicker implements ClickerPort {
   private ctx: AudioContext | null = null;
   private pending: OscillatorNode[] = [];
+  private generation = 0;
 
   constructor(private now: () => number = () => Date.now()) {}
 
@@ -33,19 +34,45 @@ export class WebAudioClicker implements ClickerPort {
   countIn(bpm: number, beats: number, beatsPerBar: number, startAtMs: number): void {
     const ctx = this.context();
     if (!ctx || bpm <= 0 || beats <= 0) return;
+    // Clear any previously pending schedule either way (synchronous path or
+    // a still-resolving resume from an earlier call).
+    this.stop();
+    this.generation++;
+    const generation = this.generation;
     // Wrap the entire audio operation: the engine calls this from its tick;
     // audio must never throw into it. If something fails mid-schedule, stop()
     // cancels any partial schedule and prevents half-configured oscillators.
     try {
-      if (ctx.state === 'suspended') void ctx.resume().catch(() => undefined);
+      if (ctx.state === 'suspended') {
+        // The clock is frozen while suspended: reading ctx.currentTime now
+        // would anchor the schedule to a stale time and every click would
+        // land late by the resume latency. Schedule only once resume()
+        // resolves and the audio clock is live again.
+        void ctx
+          .resume()
+          .then(() => {
+            if (generation !== this.generation) return; // superseded by a later countIn/stop
+            this.schedule(ctx, bpm, beats, beatsPerBar, startAtMs);
+          })
+          .catch(() => undefined);
+        return;
+      }
+      this.schedule(ctx, bpm, beats, beatsPerBar, startAtMs);
+    } catch {
       this.stop();
+    }
+  }
 
-      // Map the engine clock onto the audio clock once per call.
-      const audioStart = ctx.currentTime + Math.max(0, (startAtMs - this.now()) / 1000);
+  private schedule(ctx: AudioContext, bpm: number, beats: number, beatsPerBar: number, startAtMs: number): void {
+    try {
+      // Map the engine clock onto the audio clock, reading ctx.currentTime
+      // fresh at call time (never before an async resume).
+      const audioStart = ctx.currentTime + (startAtMs - this.now()) / 1000;
       const interval = 60 / bpm;
 
       for (let i = 0; i < beats; i++) {
         const t = audioStart + i * interval;
+        if (t < ctx.currentTime) continue; // already in the past: skip, don't play late
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
@@ -68,6 +95,7 @@ export class WebAudioClicker implements ClickerPort {
   }
 
   stop(): void {
+    this.generation++;
     for (const osc of this.pending) {
       try {
         osc.stop(0);

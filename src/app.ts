@@ -15,11 +15,12 @@ function safeLocalStorage(): StorageLike | null {
 
 export const store = createStore();
 export const library = new Library(safeLocalStorage());
+const clicker = new WebAudioClicker();
 export const commands = createCommands({
   store,
   library,
   setHash: (hash) => history.replaceState(null, '', hash || location.pathname),
   baseUrl: location.origin + location.pathname,
   now: () => Date.now(),
-  createClicker: () => new WebAudioClicker(),
+  createClicker: () => clicker,
 });

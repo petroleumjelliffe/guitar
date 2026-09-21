@@ -26,9 +26,8 @@ live in your browser and may be lost when formats change.
 - Library saved in the browser, plus a shareable link per lesson that
   carries its sections
 
-Coming next (specs in `docs/superpowers/specs/`): tap tempo with a
-click-track count-in before each loop restart; a DAW-style arrange view;
-Apple Music as a second source.
+Coming next (specs in `docs/superpowers/specs/`): a DAW-style arrange
+view; Apple Music as a second source.
 
 ## Hotkeys
 
@@ -45,7 +44,7 @@ Apple Music as a second source.
 | `,` / `.` | Step one frame (paused) |
 | `-` / `=` | Speed down / up |
 | `[` / `]` | Mark start / mark end |
-| `G` | Cycle silent gap 0 → 1 → 2 → 3 s (sections without a tempo) |
+| `G` | Cycle silent gap 0 → 1 → 2 → 3 s (used when the section has no tempo or count-in is off) |
 | `T` | Tap tempo for the selected section |
 | `M` / `R` | Mirror / rotate 180° (press again for normal) |
 | `Delete` | Delete selected section (undo offered) |

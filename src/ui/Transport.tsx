@@ -43,7 +43,7 @@ export function Transport() {
             key={g}
             class={g === lesson.gap ? 'active' : ''}
             onClick={() => commands.setGap(g)}
-            title="G cycles · used when the section has no tempo"
+            title="G cycles · used when the section has no tempo or count-in is off"
           >
             {g === 0 ? 'none' : `${g}s`}
           </button>

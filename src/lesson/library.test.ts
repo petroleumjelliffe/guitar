@@ -58,6 +58,31 @@ describe('Library', () => {
     expect(new Library(storage).list()).toEqual([]);
   });
 
+  test('a pre-branch lesson missing the new fields is dropped', () => {
+    const storage = new MemStorage();
+    const oldLesson = {
+      v: 1,
+      videoId: 'dQw4w9WgXcQ',
+      title: 'Old',
+      updatedAt: 1,
+      sections: [{ id: 'x', name: 'S', start: 0, end: 1, rate: 1 }],
+      // no gap, no countIn, sections missing bpm/beatsPerBar
+    };
+    storage.setItem(LIBRARY_KEY, JSON.stringify({ v: 1, lessons: { dQw4w9WgXcQ: oldLesson } }));
+    const lib = new Library(storage);
+    expect(lib.get('dQw4w9WgXcQ')).toBeUndefined();
+    expect(lib.list()).toEqual([]);
+  });
+
+  test('a valid lesson with all new fields still loads', () => {
+    const storage = new MemStorage();
+    const l = { ...createLesson('dQw4w9WgXcQ', 'New', 1), sections: [{ id: 'x', name: 'S', start: 0, end: 1, rate: 1, bpm: 120, beatsPerBar: 4 as const }] };
+    storage.setItem(LIBRARY_KEY, JSON.stringify({ v: 1, lessons: { [l.videoId]: l } }));
+    const reloaded = new Library(storage);
+    expect(reloaded.get('dQw4w9WgXcQ')).toEqual(l);
+    expect(reloaded.list()).toHaveLength(1);
+  });
+
   test('null storage works in memory and reports unavailable', () => {
     const lib = new Library(null);
     lib.save(createLesson('dQw4w9WgXcQ'));
