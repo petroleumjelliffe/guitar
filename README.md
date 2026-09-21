@@ -10,17 +10,24 @@ stays correct when slowed because YouTube's player handles that.
 Hands stay on the guitar: every action has a hotkey, and a Bluetooth
 page-turner pedal can send the same keys.
 
-## Features (v1)
+Live: https://petroleumjelliffe.github.io/guitar/ — alpha; saved lessons
+live in your browser and may be lost when formats change.
+
+## Features
 
 - Named, loopable sections with a per-section speed (0.25×–2×, in
   0.05× steps between 0.75× and 1×)
 - Optional pause between loop repeats so you can reset your hand
 - ±0.1 s nudging of section start and end
 - Frame stepping while paused (`,` / `.`) to watch fingering closely
-- Mirror (`M`) and rotate-180 (`R`) so the instructor's guitar matches
-  your view of your own
+- View modes — normal, mirror (`M`), rotate 180° (`R`) — so the
+  instructor's guitar matches your view of your own
 - Library saved in the browser, plus a shareable link per lesson that
   carries its sections
+
+Coming next (specs in `docs/superpowers/specs/`): tap tempo with a
+click-track count-in before each loop restart; a DAW-style arrange view;
+Apple Music as a second source.
 
 ## Hotkeys
 
@@ -38,13 +45,24 @@ page-turner pedal can send the same keys.
 | `-` / `=` | Speed down / up |
 | `[` / `]` | Mark start / mark end |
 | `G` | Cycle gap 0 → 1 → 2 → 3 s |
-| `M` / `R` | Mirror / rotate 180° |
+| `M` / `R` | Mirror / rotate 180° (press again for normal) |
 | `Delete` | Delete selected section (undo offered) |
 
-## Non-goals (v1)
+Hotkeys are ignored while typing in a text field.
 
-- Pitch shifting independent of speed. The embedded player can't do
-  it; a browser extension could, later.
+## If a video won't play
+
+The player shows YouTube's error code. **101/150** means YouTube
+refused the embed: either the owner disabled embedding, or YouTube is
+showing its "confirm you're not a bot" gate — turn off any VPN, sign in
+to youtube.com in another tab, then reload. **100** is a removed or
+private video; **2** an invalid ID.
+
+## Non-goals
+
+- Pitch shifting independent of speed, or any audio analysis. The
+  embedded player never exposes its audio; a browser extension could,
+  later.
 - Accounts or cross-device sync. The shareable link covers moving a
   lesson between devices.
 - Downloading video. Everything plays through the official YouTube
@@ -57,16 +75,23 @@ npm install
 npm run dev      # local server
 npm test         # unit tests
 npm run build    # static site in dist/
+npm run preview  # serve dist/
 ```
 
-Static site: no backend, no login. Deployable to any static host.
-
-## Docs
-
-- `docs/superpowers/specs/` — design specs
-- `docs/superpowers/plans/` — implementation plans
+`spikes/index.html` (served by the dev server at `/spikes/`) is a
+throwaway probe of the YouTube embed's behaviour; its findings are
+recorded in the v1 spec.
 
 ## Deploying
 
-Pushes to `main` build and deploy to GitHub Pages via `.github/workflows/pages.yml`.
-One-time setup: repo Settings → Pages → Source: **GitHub Actions**.
+Pushes to `main` run tests, build, and deploy to GitHub Pages via
+`.github/workflows/pages.yml`. One-time setup: repo Settings → Pages →
+Source: **GitHub Actions**.
+
+## Docs
+
+- `docs/superpowers/specs/` — design specs (v1, metronome count-in,
+  arrange-view UI, multi-source playback)
+- `docs/superpowers/plans/` — implementation plans
+- `design/wireframes/` — Claude Design wireframe exports
+- `CLAUDE.md` — working notes and rules for AI-assisted changes

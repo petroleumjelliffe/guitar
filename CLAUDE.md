@@ -1,45 +1,76 @@
 # Loop Lesson — working notes for Claude
 
-Static single-page app: Vite + TypeScript + Preact. No backend.
-Video plays through the official YouTube IFrame Player API in an
-iframe; we never touch the media stream.
+Static single-page app: Vite + TypeScript + Preact + `@preact/signals`,
+Vitest. No backend. Deployed to GitHub Pages from `main` by
+`.github/workflows/pages.yml`. Video plays through the official YouTube
+IFrame Player API in an iframe; we never touch the media stream.
+
+Status: alpha ("v0"). Nothing shared; formats may change freely.
 
 ## Layout
 
 ```
 src/
-  player/    wraps the YouTube IFrame API behind a small interface
-  loop/      loop engine: pure logic, driven by a tick, no DOM
-  lesson/    data model, URL encode/decode, browser-storage library
+  player/    wraps the YouTube IFrame API behind PlayerPort (+ FakePlayer)
+  loop/      loop engine: pure logic, driven by a 50 ms tick, no DOM
+  lesson/    data model, URL encode/decode, browser-storage library, tap tempo
+  audio/     ClickerPort + WebAudioClicker (count-in clicks); only file that touches Web Audio
   commands/  every user action, one place; hotkeys/pedal/buttons call these
-  ui/        Preact components; render from app state, call commands
+  state/     signals store (createStore)
+  ui/        Preact components; render from the store, call commands
+  app.ts     the only place singletons are created
+spikes/      throwaway browser probes (not part of the app)
+design/      Claude Design wireframe exports
 ```
 
-Only `player/` may import the YouTube API. `loop/` and `lesson/`
-must stay browser-free so they can be unit-tested with fakes.
+Only `player/youtube.ts` may reference the YouTube API (`YT`). Only
+`audio/webAudio.ts` may reference Web Audio. `loop/`, `lesson/` and
+`state/` stay browser-free so they are unit-tested with fakes.
 
 ## Rules
 
-- TDD for `loop/` and `lesson/`: write the failing test first.
+- TDD for `loop/`, `lesson/` and `commands/`: write the failing test
+  first; run the focused file while iterating, the full suite before
+  committing.
 - Every user action is a command in `commands/`. Never bind a hotkey
-  or button directly to the player.
+  or button directly to the player, engine or lesson.
+- Every lesson mutation goes through `updateLesson` (hash + debounced
+  save + engine sync). Never set `store.activeSectionId` directly; the
+  engine's `onChange` does that.
 - Hide YouTube's native controls and keep the click-catching overlay;
   without it, the iframe steals keyboard focus and hotkeys die.
-- Mirror/rotate is view-only state. Never persist it or put it in the
-  share URL.
-- Alpha: share-URL and storage formats may change freely (no migrations)
-  until the user declares a release; keep the `v` field anyway.
+- Never auto-focus a text input after a hotkey: it would swallow the
+  next hotkeys as typing and break the pedal flow.
+- View mode (normal/mirror/rotate) is view-only state. Never persist it
+  or put it in the share URL.
+- Alpha: share-URL and storage formats may change freely (no
+  migrations) until the user declares a release; keep the `v` field.
+- Commit messages end with
+  `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`.
 
-## Known constraints
+## Known constraints (verified in `spikes/`)
 
-- Playback rates: the embed API offers fixed steps
-  (0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2). Whether intermediate
-  rates work is unverified; see spec.
+- Playback rates: `getAvailablePlaybackRates()` reports only the 8
+  fixed steps, but `setPlaybackRate()` honours intermediate values
+  (0.85, 0.9 verified). `availableRates()` is the union of
+  `DEFAULT_RATES` and the reported list.
 - No time-update event: the loop engine polls `getCurrentTime()`.
-  Expect 100–200 ms overshoot at a section end.
-- No frame-step API and no frame-rate info: frame step = seek ±1/30 s.
+  Measured overshoot at a section end: 5–50 ms at 50 ms polling.
+- No frame-step API and no frame-rate info: frame step = seek ±1/30 s
+  (~250 ms latency, no spinner).
+- Player error 150 also fires for YouTube's "confirm you're not a bot"
+  gate (VPN exit IPs, localhost); it is not always "embedding disabled".
+- The app cannot hear the video (cross-origin iframe): no BPM
+  detection, no pitch shift. Tempo comes from tap tempo.
 
 ## Docs
 
-Specs in `docs/superpowers/specs/`, plans in `docs/superpowers/plans/`.
-Read the current spec before changing behaviour.
+- Specs: `docs/superpowers/specs/` — v1 (`2026-09-18-loop-lesson-design.md`),
+  metronome count-in (`2026-09-20-metronome-count-in-design.md`),
+  arrange-view UI (`2026-09-20-arrange-view-ui-design.md`),
+  multi-source playback (`multi-source.md`, user-authored; reconciliation
+  spec pending).
+- Plans: `docs/superpowers/plans/`.
+- Build order agreed: metronome → arrange-view UI → multi-source.
+- Read the relevant spec before changing behaviour; later specs
+  supersede v1 where they conflict.
