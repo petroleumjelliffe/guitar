@@ -1,5 +1,6 @@
 import type { Section } from '../lesson/model';
 import type { PlayerPort } from '../player/port';
+import type { ClickerPort } from '../audio/port';
 
 export const TICK_MS = 50;
 export const FRAME = 1 / 30; // one frame at 30 fps; verified usable in the player spikes
@@ -13,10 +14,14 @@ export interface LoopState {
 /**
  * Decides, once per tick, whether the player should jump back to the
  * start of the active section. Pure logic over PlayerPort; no DOM.
+ * When the section has a tempo, a loop restart runs a click count-in
+ * (via ClickerPort) instead of the silent seconds gap.
  */
 export class LoopEngine {
   state: LoopState = { section: null, looping: false, gapUntil: null };
   gap = 0; // seconds of pause between repeats
+  countIn = 1; // bars of count-in for sections with a tempo
+  clicker: ClickerPort | null = null;
   onChange: (() => void) | null = null;
 
   constructor(private player: PlayerPort, private now: () => number = () => Date.now()) {}
@@ -26,7 +31,12 @@ export class LoopEngine {
     this.onChange?.();
   }
 
+  private stopClicks() {
+    this.clicker?.stop();
+  }
+
   activate(section: Section): void {
+    this.stopClicks();
     this.player.setRate(section.rate);
     this.player.seek(section.start);
     this.player.play();
@@ -34,6 +44,7 @@ export class LoopEngine {
   }
 
   deactivate(): void {
+    this.stopClicks();
     this.set({ section: null, gapUntil: null });
   }
 
@@ -44,6 +55,7 @@ export class LoopEngine {
   }
 
   restart(): void {
+    this.stopClicks();
     const s = this.state.section;
     if (!s) return;
     this.player.seek(s.start);
@@ -52,6 +64,7 @@ export class LoopEngine {
   }
 
   toggleLoop(): boolean {
+    this.stopClicks();
     this.set({ looping: !this.state.looping, gapUntil: null });
     return this.state.looping;
   }
@@ -90,7 +103,15 @@ export class LoopEngine {
     if (!looping || !section || this.player.state() !== 'playing') return;
     if (this.player.currentTime() < section.end) return;
 
-    if (this.gap > 0) {
+    if (section.bpm > 0 && this.countIn > 0) {
+      const beats = this.countIn * section.beatsPerBar;
+      const bpmAtRate = section.bpm * section.rate;
+      const now = this.now();
+      this.player.pause();
+      this.player.seek(section.start);
+      this.clicker?.countIn(bpmAtRate, beats, section.beatsPerBar, now);
+      this.set({ gapUntil: now + (beats * 60000) / bpmAtRate });
+    } else if (this.gap > 0) {
       this.player.pause();
       this.player.seek(section.start);
       this.set({ gapUntil: this.now() + this.gap * 1000 });

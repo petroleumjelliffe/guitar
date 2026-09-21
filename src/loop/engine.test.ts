@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import { FakePlayer } from '../player/fake';
+import { FakeClicker } from '../audio/fake';
 import type { Section } from '../lesson/model';
 import { LoopEngine } from './engine';
 
@@ -8,11 +9,14 @@ const section: Section = { id: 's1', name: 'Riff', start: 10, end: 20, rate: 0.7
 let player: FakePlayer;
 let clock: number;
 let engine: LoopEngine;
+let clicker: FakeClicker;
 
 beforeEach(() => {
   player = new FakePlayer();
   clock = 1_000;
   engine = new LoopEngine(player, () => clock);
+  clicker = new FakeClicker();
+  engine.clicker = clicker;
 });
 
 describe('activate', () => {
@@ -210,5 +214,94 @@ describe('stepFrame', () => {
     player.time = 300;
     engine.stepFrame(1);
     expect(player.time).toBe(300);
+  });
+});
+
+describe('count-in', () => {
+  const tempoed: Section = { ...section, bpm: 120, beatsPerBar: 4, rate: 1 };
+
+  test('at the section end: pauses, seeks to start, schedules one bar of clicks, waits a bar', () => {
+    engine.activate(tempoed);
+    engine.toggleLoop();
+    player.time = 20.2;
+    player.calls = [];
+    clicker.calls = [];
+    engine.tick();
+    expect(player.calls).toEqual(['pause', 'seek:10']);
+    expect(clicker.calls).toEqual(['countIn:120:4:4:1000']);
+    expect(engine.state.gapUntil).toBe(1000 + 2000); // 4 beats at 120 BPM
+    clock = 3000;
+    engine.tick();
+    expect(player.calls).toEqual(['pause', 'seek:10', 'play']);
+  });
+
+  test('runs at bpm × rate and honours countIn bars and beatsPerBar', () => {
+    engine.countIn = 2;
+    engine.activate({ ...tempoed, rate: 0.5, beatsPerBar: 3 });
+    engine.toggleLoop();
+    player.time = 20.2;
+    clicker.calls = [];
+    engine.tick();
+    expect(clicker.calls).toEqual(['countIn:60:6:3:1000']);
+    expect(engine.state.gapUntil).toBe(1000 + 6000); // 6 beats at 60 BPM
+  });
+
+  test('falls back to the seconds gap when the section has no tempo', () => {
+    engine.gap = 2;
+    engine.activate(section); // bpm 0
+    engine.toggleLoop();
+    player.time = 20.2;
+    clicker.calls = [];
+    engine.tick();
+    expect(clicker.calls).toEqual([]);
+    expect(engine.state.gapUntil).toBe(3000);
+  });
+
+  test('falls back to the seconds gap when countIn is 0', () => {
+    engine.countIn = 0;
+    engine.gap = 1;
+    engine.activate(tempoed);
+    engine.toggleLoop();
+    player.time = 20.2;
+    clicker.calls = [];
+    engine.tick();
+    expect(clicker.calls).toEqual([]);
+    expect(engine.state.gapUntil).toBe(2000);
+  });
+
+  test('with countIn 0 and gap 0 just seeks', () => {
+    engine.countIn = 0;
+    engine.activate(tempoed);
+    engine.toggleLoop();
+    player.time = 20.2;
+    player.calls = [];
+    engine.tick();
+    expect(player.calls).toEqual(['seek:10']);
+  });
+
+  test.each([
+    ['restart', () => engine.restart()],
+    ['deactivate', () => engine.deactivate()],
+    ['toggleLoop off', () => engine.toggleLoop()],
+    ['seek away', () => engine.seekTo(100)],
+    ['activate another', () => engine.activate({ ...section, id: 'other' })],
+  ])('%s during the count-in stops the clicks', (_name, interrupt) => {
+    engine.activate(tempoed);
+    engine.toggleLoop();
+    player.time = 20.2;
+    engine.tick();
+    clicker.calls = [];
+    interrupt();
+    expect(clicker.calls).toEqual(['stop']);
+    expect(engine.state.gapUntil).toBeNull();
+  });
+
+  test('works without a clicker', () => {
+    engine.clicker = null;
+    engine.activate(tempoed);
+    engine.toggleLoop();
+    player.time = 20.2;
+    expect(() => engine.tick()).not.toThrow();
+    expect(engine.state.gapUntil).toBe(3000);
   });
 });
