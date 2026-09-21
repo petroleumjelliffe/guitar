@@ -1,3 +1,4 @@
+import { WebAudioClicker } from './audio/webAudio';
 import { createCommands } from './commands/commands';
 import { Library, type StorageLike } from './lesson/library';
 import { createStore } from './state/store';
@@ -20,6 +21,5 @@ export const commands = createCommands({
   setHash: (hash) => history.replaceState(null, '', hash || location.pathname),
   baseUrl: location.origin + location.pathname,
   now: () => Date.now(),
-  // Stub until Task 8 wires up the real WebAudioClicker.
-  createClicker: () => ({ countIn() {}, stop() {} }),
+  createClicker: () => new WebAudioClicker(),
 });

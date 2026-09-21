@@ -39,8 +39,24 @@ export function Transport() {
       <div class="transport-row">
         <span class="label">Gap</span>
         {[0, 1, 2, 3].map((g) => (
-          <button key={g} class={g === lesson.gap ? 'active' : ''} onClick={() => commands.setGap(g)} title="G cycles">
+          <button
+            key={g}
+            class={g === lesson.gap ? 'active' : ''}
+            onClick={() => commands.setGap(g)}
+            title="G cycles · used when the section has no tempo"
+          >
             {g === 0 ? 'none' : `${g}s`}
+          </button>
+        ))}
+        <span class="label">Count-in</span>
+        {([0, 1, 2] as const).map((bars) => (
+          <button
+            key={bars}
+            class={bars === lesson.countIn ? 'active' : ''}
+            onClick={() => commands.setCountIn(bars)}
+            title="Clicks before each loop restart; needs a tapped tempo"
+          >
+            {bars === 0 ? 'off' : bars === 1 ? '1 bar' : '2 bars'}
           </button>
         ))}
         <span class="spacer" />
