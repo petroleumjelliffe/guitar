@@ -110,6 +110,7 @@ export function ArrangeLane({ compact = false }: { compact?: boolean }) {
             step={1}
             value={zoomIndex}
             onInput={(e) => setZoom(Number((e.target as HTMLInputElement).value))}
+            onPointerUp={(e) => (e.currentTarget as HTMLElement).blur()}
             aria-label="Zoom"
           />
           <button class="key xs" disabled={!zoom} onClick={() => zoomStep(1)} aria-label="Zoom out">−</button>

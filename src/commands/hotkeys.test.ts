@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { keyToCommand, type KeyInput } from './hotkeys';
+import { focusSwallows, keyToCommand, type FocusTarget, type KeyInput } from './hotkeys';
 
 const k = (key: string, over: Partial<KeyInput> = {}): KeyInput => ({
   key, shiftKey: false, altKey: false, ctrlKey: false, metaKey: false, inInput: false, ...over,
@@ -44,5 +44,44 @@ describe('keyToCommand', () => {
     [k('l', { ctrlKey: true }), null],
   ])('%o → %o', (input, expected) => {
     expect(keyToCommand(input)).toEqual(expected);
+  });
+});
+
+const target = (over: Partial<FocusTarget>): FocusTarget => ({
+  tagName: 'DIV', isContentEditable: false, focusVisible: false, ...over,
+});
+
+describe('focusSwallows', () => {
+  test('null target never swallows', () => {
+    expect(focusSwallows(null, ' ')).toBe(false);
+  });
+  test('text input swallows any key', () => {
+    const t = target({ tagName: 'INPUT', type: 'text' });
+    expect(focusSwallows(t, ' ')).toBe(true);
+    expect(focusSwallows(t, 'l')).toBe(true);
+    expect(focusSwallows(t, 'Enter')).toBe(true);
+  });
+  test('input type=range does not swallow', () => {
+    const t = target({ tagName: 'INPUT', type: 'range' });
+    expect(focusSwallows(t, ' ')).toBe(false);
+    expect(focusSwallows(t, '[')).toBe(false);
+  });
+  test('textarea swallows any key', () => {
+    expect(focusSwallows(target({ tagName: 'TEXTAREA' }), ' ')).toBe(true);
+  });
+  test('contentEditable element swallows any key', () => {
+    expect(focusSwallows(target({ tagName: 'DIV', isContentEditable: true }), 'l')).toBe(true);
+  });
+  test('button without :focus-visible does not swallow Space', () => {
+    expect(focusSwallows(target({ tagName: 'BUTTON', focusVisible: false }), ' ')).toBe(false);
+  });
+  test('button focused by keyboard swallows Space and Enter, not other keys', () => {
+    const t = target({ tagName: 'BUTTON', focusVisible: true });
+    expect(focusSwallows(t, ' ')).toBe(true);
+    expect(focusSwallows(t, 'Enter')).toBe(true);
+    expect(focusSwallows(t, 'l')).toBe(false);
+  });
+  test('role=radio focused by keyboard swallows Space', () => {
+    expect(focusSwallows(target({ tagName: 'DIV', role: 'radio', focusVisible: true }), ' ')).toBe(true);
   });
 });
