@@ -15,21 +15,20 @@ live in your browser and may be lost when formats change.
 
 ## Features
 
-- Named, loopable sections; playback speed 0.25×–2× (0.05× steps
-  between 0.75× and 1×), pitch preserved
-- Optional pause between loop repeats so you can reset your hand
+- Named, loopable sections; playback speed 0.25×–2× in 0.05× steps,
+  pitch preserved
 - Tap the lesson's tempo (`T`) and get a one- or two-bar click count-in before each loop restart
 - ±0.1 s nudging of section start and end
-- Frame stepping while paused (`,` / `.`) to watch fingering closely
-- View modes (normal / mirror / rotate), frame stepping, share and
-  library live in a small overlay on the video
+- View modes (normal / mirror / rotate) and frame stepping (`,` / `.`,
+  paused) live in a small overlay on the video, alongside share and
+  library
 - Library saved in the browser, plus a shareable link per lesson that
   carries its sections
 - Sections are recorded live: MARK while playing, END to close; then
   drag or nudge their edges on a zoomable timeline
 
-Coming next (specs in `docs/superpowers/specs/`): a DAW-style arrange
-view; Apple Music as a second source.
+Coming next (specs in `docs/superpowers/specs/`): Apple Music as a
+second source.
 
 ## Hotkeys
 

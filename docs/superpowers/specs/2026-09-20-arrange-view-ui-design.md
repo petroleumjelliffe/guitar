@@ -2,8 +2,10 @@
 
 Date: 2026-09-20
 Status: implemented 2026-09-22 (plan
-docs/superpowers/plans/2026-09-21-arrange-view-ui.md); styling
-provisional. Derived from the Claude Design project
+docs/superpowers/plans/2026-09-21-arrange-view-ui.md); approved
+2026-09-20 (§9 confirmed, §10 answered); amended 2026-09-21 for global
+speed (§2, §5.5, §6) and the designer's "Section Recording Flow"
+(§5.9); styling provisional. Derived from the Claude Design project
 "Loop Lesson Wireframes" — `Loop Lesson Wireframes.dc.html` (turns 1–3,
 copy in `design/wireframes/`) and `Section Recording Flow.dc.html`
 (three-step MARK → END → name flow). Target: option **3a** (arrange view, LCD speed gauge) on
@@ -227,6 +229,9 @@ ticks every 0.10 from 0.5 to 1.5 plus the two ends. Interactions:
 - **Follow rule**: while playing, the view scrolls to keep the playhead
   inside the middle 60 %; while recording it is pinned at ~65 % and the
   ruler scrolls under it.
+
+Known: at the 10 s view the minor tick is 2 s, so default snapping is
+coarse there — hold Alt for 0.1 s (spec defect noted 2026-09-22).
 
 `setSectionEdge` is a new command (a `nudge` with an absolute value;
 same normalisation, same `updateLesson` path).
