@@ -211,12 +211,13 @@ input:focus { outline: 2px solid var(--focus); outline-offset: 1px; }
 .seg { background: var(--key); color: #b9b6b0; border: none; border-radius: 0; min-height: 22px; height: 22px; padding: 0 9px; font: 500 10px var(--font); }
 .seg + .seg { border-left: 1px solid var(--key-border); }
 .seg.lit { background: var(--gold); color: var(--gold-ink); font-weight: 600; }
-.zoom { width: 104px; height: 20px; min-height: 0; accent-color: #c9c6bf; }
+.zoom { width: 104px; height: 20px; min-height: 0; padding: 0; border: none; background: transparent; accent-color: #c9c6bf; }
 .ruler { position: relative; height: 16px; border-bottom: 1px solid var(--ruler-line); margin-bottom: 6px; overflow: hidden; }
 .tick { position: absolute; bottom: 0; width: 1px; height: 4px; background: var(--tick-minor); }
 .tick.major { height: 7px; background: var(--tick); }
-.tick label { position: absolute; left: 3px; bottom: 6px; font: 400 8px var(--mono); color: #8b8882; white-space: nowrap; }
+.tick .tick-label { position: absolute; left: 3px; bottom: 6px; font: 400 8px var(--mono); color: #8b8882; white-space: nowrap; }
 .lane { position: relative; height: 52px; border-radius: 4px; background: var(--lane); box-shadow: 0 1px 3px rgba(0, 0, 0, .5) inset; overflow: hidden; cursor: pointer; touch-action: pan-y; }
+.lane.rec { box-shadow: inset 0 0 0 1px var(--recording-border), inset 0 0 10px rgba(230, 90, 70, .35), 0 1px 3px rgba(0, 0, 0, .5) inset; }
 .block { position: absolute; top: 5px; bottom: 5px; border-radius: 4px; background: var(--block); border: 1px solid var(--block-border); color: var(--block-ink); font: 500 10px var(--font); padding: 4px 6px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
 .block.selected { border-color: var(--gold-border); opacity: .85; }
 .block.active { background: var(--gold); border: 1.5px solid var(--gold-border); color: var(--gold-ink); font-weight: 600; box-shadow: var(--gold-glow); }
@@ -234,3 +235,7 @@ input:focus { outline: 2px solid var(--focus); outline-offset: 1px; }
 .arrange.compact { padding: 0; }
 .arrange.compact .lane { height: 22px; }
 .arrange.compact .block { top: 3px; bottom: 3px; padding: 0 4px; font-size: 8px; }
+/* The edit row's text tokens (.group-label, .fine, .chip, .seg) are designed
+   for the dark transport strip; give the compact row the same dark surface
+   so they stay legible on the light --chrome background it sits on here. */
+.arrange.compact .edit-row { background: var(--strip); border-radius: var(--radius); padding: 7px 10px; margin: 0 0 6px; }

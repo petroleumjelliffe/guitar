@@ -19,11 +19,14 @@ export function ArrangeLane({ compact = false }: { compact?: boolean }) {
   const recording = pending !== null;
   const t = store.currentTime.value;
   const laneRef = useRef<HTMLDivElement>(null);
+  const didDrag = useRef(false);
 
   // Auto-follow: keep the playhead in the middle band while playing; pin it
-  // at 65 % while recording; back off for 3 s after a manual pan/zoom.
+  // at 65 % while recording; back off for 3 s after a manual pan/zoom. The
+  // hidden compact instance (narrow layout only shows it via CSS, but both
+  // mount) must not also write arrange.view.
   useEffect(() => {
-    if (!zoom || !playing) return;
+    if (compact || !zoom || !playing) return;
     if (Date.now() - arrange.lastUserScrollAt.value < FOLLOW_PAUSE_MS) return;
     const next = recording ? pinned(view, t, duration) : follow(view, t, duration);
     if (next.start !== view.start) arrange.view.value = next;
@@ -71,6 +74,7 @@ export function ArrangeLane({ compact = false }: { compact?: boolean }) {
   };
   const moveDrag = (e: PointerEvent) => {
     if (!drag) return;
+    didDrag.current = true;
     const step = e.altKey ? 0.1 : minor;
     arrange.dragging.value = { ...drag, time: snapTo(timeAt(e.clientX), step) };
   };
@@ -78,6 +82,8 @@ export function ArrangeLane({ compact = false }: { compact?: boolean }) {
     if (!drag) return;
     commands.setSectionEdge(drag.id, drag.edge, drag.time);
     arrange.dragging.value = null;
+    // Reset after the click that follows the release has had a chance to see it.
+    setTimeout(() => { didDrag.current = false; }, 0);
   };
   const bounds = (s: { id: string; start: number; end: number }) => {
     if (drag?.id !== s.id) return s;
@@ -86,9 +92,14 @@ export function ArrangeLane({ compact = false }: { compact?: boolean }) {
       : { start: s.start, end: Math.max(drag.time, s.start + 0.2) };
   };
 
+  // Desktop always shows the edit row (with the zoom cluster); compact only
+  // shows it — without zoom — while a section is selected (spec §3).
+  const showEditRow = !compact || !!selected;
+  const showZoom = !compact;
+
   return (
     <div class={`arrange${compact ? ' compact' : ''}`}>
-      {!compact && (
+      {showEditRow && (
         <div class="edit-row">
           <span class="group-label">EDIT EDGE</span>
           <div class="segmented" role="radiogroup" aria-label="Edge to edit">
@@ -99,28 +110,32 @@ export function ArrangeLane({ compact = false }: { compact?: boolean }) {
           <button class="key xs" disabled={!selected} onClick={() => commands.nudge(edge, 0.1)} aria-label="Nudge edge later (Shift/Alt+→)">▶</button>
           <span class="fine">±0.10s</span>
           <span class="chip">{selected ? formatTime(selected[edge]) : '—'}</span>
-          <span class="spacer" />
-          <span class="fine">{zoom ? `${zoom.length}s view` : 'full'}</span>
-          <button class="key xs" disabled={zoomIndex === 0} onClick={() => zoomStep(-1)} aria-label="Zoom in">+</button>
-          <input
-            type="range"
-            class="zoom"
-            min={0}
-            max={ZOOM_STEPS.length}
-            step={1}
-            value={zoomIndex}
-            onInput={(e) => setZoom(Number((e.target as HTMLInputElement).value))}
-            onPointerUp={(e) => (e.currentTarget as HTMLElement).blur()}
-            aria-label="Zoom"
-          />
-          <button class="key xs" disabled={!zoom} onClick={() => zoomStep(1)} aria-label="Zoom out">−</button>
+          {showZoom && (
+            <>
+              <span class="spacer" />
+              <span class="fine">{zoom ? `${zoom.length}s view` : 'full'}</span>
+              <button class="key xs" disabled={zoomIndex === 0} onClick={() => zoomStep(-1)} aria-label="Zoom in">+</button>
+              <input
+                type="range"
+                class="zoom"
+                min={0}
+                max={ZOOM_STEPS.length}
+                step={1}
+                value={zoomIndex}
+                onInput={(e) => setZoom(Number((e.target as HTMLInputElement).value))}
+                onPointerUp={(e) => (e.currentTarget as HTMLElement).blur()}
+                aria-label="Zoom"
+              />
+              <button class="key xs" disabled={!zoom} onClick={() => zoomStep(1)} aria-label="Zoom out">−</button>
+            </>
+          )}
         </div>
       )}
       {!compact && (
         <div class="ruler">
           {rulerTicks(view).map((k) => (
             <span key={k.t} class={`tick${k.major ? ' major' : ''}`} style={{ left: x(k.t) }}>
-              {k.major && <label>{formatRulerLabel(k.t)}</label>}
+              {k.major && <span class="tick-label">{formatRulerLabel(k.t)}</span>}
             </span>
           ))}
         </div>
@@ -131,7 +146,7 @@ export function ArrangeLane({ compact = false }: { compact?: boolean }) {
         onWheel={onWheel}
         onPointerMove={moveDrag}
         onPointerUp={endDrag}
-        onPointerCancel={() => { arrange.dragging.value = null; }}
+        onPointerCancel={() => { arrange.dragging.value = null; didDrag.current = false; }}
         onClick={(e) => {
           if ((e.target as HTMLElement).closest('.block')) return;
           commands.seekTo(timeAt(e.clientX));
@@ -149,7 +164,11 @@ export function ArrangeLane({ compact = false }: { compact?: boolean }) {
               role="button"
               tabIndex={0}
               title={s.name}
-              onClick={(e) => { e.stopPropagation(); commands.jumpToSectionId(s.id); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (didDrag.current) { didDrag.current = false; return; }
+                commands.jumpToSectionId(s.id);
+              }}
               onDblClick={(e) => { e.stopPropagation(); commands.beginRename(s.id); }}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); commands.jumpToSectionId(s.id); } }}
             >
