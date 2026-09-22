@@ -342,6 +342,9 @@ the seconds gap.
 - Position readout: tenths, not hundredths (frames would be preferred
   but the player cannot report frame rate) → §5.4.
 - Narrow layout keeps the gauge (44 px).
+- Speed readout beside the gauge is the multiplier (`0.80 ×`), not a
+  percentage (2026-09-21). After END, Space plays from the section's end
+  so the first pass begins with the count-in — intended.
 - Styling is **not final**. All colours, gradients and glows are CSS
   custom properties (§4) so a restyle is a token change; component
   structure must not bake in any colour.
