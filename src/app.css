@@ -227,6 +227,7 @@ input:focus { outline: 2px solid var(--focus); outline-offset: 1px; }
 .group { display: flex; flex-direction: column; gap: 3px; padding: 6px 0; }
 .group .keys { height: 34px; display: flex; align-items: center; gap: 6px; }
 .group > .key { margin-top: 2px; }
+.key.rewind, .key.loop { width: 34px; padding: 0; }
 .key.play { width: 46px; }
 .key.play.lit { background: var(--play); color: var(--play-ink); border-color: var(--play-border); box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset, var(--play-glow); }
 .key.loop.lit { background: var(--count); color: var(--count-ink); border-color: var(--count-border); }
