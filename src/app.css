@@ -180,3 +180,28 @@ button.danger { color: var(--danger); }
 .name-field { flex: 1; min-width: 0; min-height: 28px; padding: 3px 6px; font: 500 12px var(--font); border-radius: 3px; border: 1.5px solid var(--focus); box-shadow: 0 0 0 2px rgba(63, 134, 196, .22); }
 .panel-foot { margin-top: auto; padding: 7px 10px; border-top: 1px solid #d5d2cb; background: var(--panel-foot); font: 400 10px var(--font); color: var(--muted); }
 @media (min-width: 720px) { .row-num { display: none; } }
+
+/* --- transport strip --- */
+.strip { border-radius: var(--radius); background: var(--strip); box-shadow: 0 1px 0 rgba(255, 255, 255, .12) inset, 0 2px 6px rgba(0, 0, 0, .28); display: flex; flex-direction: column; }
+.strip-row { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 16px; padding: 10px 14px; }
+.transport-strip { border-bottom: 1px solid var(--strip-line); }
+.group { display: flex; flex-direction: column; gap: 3px; padding: 6px 0; }
+.group .keys { height: 34px; display: flex; align-items: center; gap: 6px; }
+.group > .key { margin-top: 2px; }
+.key.play { width: 46px; }
+.key.play.lit { background: var(--play); color: var(--play-ink); border-color: var(--play-border); box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset, var(--play-glow); }
+.key.loop.lit { background: var(--count); color: var(--count-ink); border-color: var(--count-border); }
+.key.loop.pulse { animation: pulse .5s ease-in-out infinite alternate; }
+@keyframes pulse { from { opacity: 1; } to { opacity: .6; } }
+.key.mark { width: 74px; background: var(--mark); color: var(--mark-ink); border-color: var(--mark-border); }
+.mark-dot { width: 8px; height: 8px; border-radius: 4px; background: var(--mark-dot); }
+.key.end { width: 74px; background: var(--rec); color: var(--rec-ink); border-color: var(--rec-border); box-shadow: 0 1px 0 rgba(255, 255, 255, .28) inset, var(--rec-glow); }
+.key.count { width: 58px; background: var(--count); color: var(--count-ink); border-color: var(--count-border); }
+.key.count.dim { opacity: .5; }
+.lcd-speed { display: flex; align-items: center; gap: 9px; height: 34px; }
+.gauge { cursor: ns-resize; touch-action: none; }
+.gauge:focus { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 50%; }
+.presets { position: absolute; top: 100%; left: 0; margin-top: 6px; z-index: 5; display: grid; grid-template-columns: repeat(4, auto); gap: 4px; padding: 6px; border-radius: 5px; background: var(--strip); border: 1px solid var(--key-border); box-shadow: 0 4px 12px rgba(0, 0, 0, .35); }
+.lcd-cell.tempo .lcd-keys { position: absolute; top: 100%; left: 0; display: none; gap: 3px; padding-top: 4px; }
+.lcd-cell.tempo:hover .lcd-keys, .lcd-cell.tempo:focus-within .lcd-keys { display: flex; }
+.key.meter { width: auto; padding: 0 6px; }

@@ -4,7 +4,7 @@ import { Notice } from './Notice';
 import { SectionsPanel } from './SectionsPanel';
 import { Stage } from './Stage';
 import { Timeline } from './Timeline';
-import { Transport } from './Transport';
+import { TransportStrip } from './TransportStrip';
 
 export function App() {
   const lesson = store.lesson.value;
@@ -23,7 +23,7 @@ export function App() {
       <div class="caption">{lesson.title}</div>
       <Timeline />
       <div class="lesson-body">
-        <Transport />
+        <div class="strip"><TransportStrip /></div>
         <SectionsPanel />
       </div>
     </main>
