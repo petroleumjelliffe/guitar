@@ -16,6 +16,10 @@ export interface Store {
   activeSectionId: Signal<string | null>;
   selectedSectionId: Signal<string | null>;
   pendingStart: Signal<number | null>;
+  /** Section whose inline name field is open (set by END or double-click). */
+  editingSectionId: Signal<string | null>;
+  /** Taps in the current tap-tempo run; 0 when none. */
+  tapCount: Signal<number>;
   looping: Signal<boolean>;
   inGap: Signal<boolean>;
   playerState: Signal<PlayerState>;
@@ -38,6 +42,8 @@ export function createStore(): Store {
     activeSectionId: signal(null),
     selectedSectionId: signal(null),
     pendingStart: signal(null),
+    editingSectionId: signal(null),
+    tapCount: signal(0),
     looping: signal(false),
     inGap: signal(false),
     playerState: signal('unstarted'),

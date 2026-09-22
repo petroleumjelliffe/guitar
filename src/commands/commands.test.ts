@@ -301,20 +301,41 @@ describe('rate commands', () => {
 });
 
 describe('marking and editing', () => {
-  test('markStart then markEnd creates, selects and activates a section', () => {
+  test('markStart is ignored unless the video is playing', () => {
     openWithPlayer();
-    player.r = 0.75;
-    player.time = 12.34;
+    player.time = 12.3;
+    commands.markStart();
+    expect(store.pendingStart.value).toBeNull();
+    player.play();
     commands.markStart();
     expect(store.pendingStart.value).toBe(12.3);
+  });
+  test('markEnd creates the section, pauses, arms the loop and opens the name field', () => {
+    openWithPlayer();
+    player.play();
+    player.time = 12.34;
+    commands.markStart();
     player.time = 20.06;
+    player.calls = [];
     commands.markEnd();
     const s = store.lesson.value!.sections[0]!;
     expect(s).toMatchObject({ name: 'Section 1', start: 12.3, end: 20.1 });
     expect(store.pendingStart.value).toBeNull();
+    expect(player.calls).toEqual(['pause']); // no seek, no play
     expect(store.selectedSectionId.value).toBe(s.id);
     expect(store.activeSectionId.value).toBe(s.id);
-    expect(player.calls).toEqual(['seek:12.3', 'play']);
+    expect(store.looping.value).toBe(true);
+    expect(store.editingSectionId.value).toBe(s.id);
+  });
+  test('markEnd while paused also works (END is allowed paused)', () => {
+    openWithPlayer();
+    player.play();
+    player.time = 5;
+    commands.markStart();
+    player.pause();
+    player.time = 9;
+    commands.markEnd();
+    expect(store.lesson.value?.sections[0]).toMatchObject({ start: 5, end: 9 });
   });
   test('markEnd without a pending start updates the active section end', () => {
     openWithPlayer([['A', 10, 20]]);
@@ -353,15 +374,29 @@ describe('marking and editing', () => {
     expect(store.lesson.value?.sections[0]?.name).toBe('A');
     expect(store.notice.value).toBeNull();
   });
-  test('setGap and cycleGap persist and reach the engine', () => {
-    openWithPlayer();
-    commands.cycleGap();
-    commands.cycleGap();
-    expect(store.lesson.value?.gap).toBe(2);
-    expect(commands.session()?.engine.gap).toBe(2);
-    commands.setGap(3);
-    commands.cycleGap();
-    expect(store.lesson.value?.gap).toBe(0);
+  test('setSectionEdge moves an edge to an absolute time with the nudge validity rule', () => {
+    openWithPlayer([['A', 10, 20]]);
+    commands.setSectionEdge('a', 'end', 25.04);
+    expect(store.lesson.value?.sections[0]?.end).toBe(25);
+    commands.setSectionEdge('a', 'start', 12);
+    expect(store.lesson.value?.sections[0]?.start).toBe(12);
+    commands.setSectionEdge('a', 'start', 24.9); // would leave 0.1 s: ignored
+    expect(store.lesson.value?.sections[0]?.start).toBe(12);
+    commands.setSectionEdge('nope', 'end', 30); // unknown id: ignored
+    expect(store.lesson.value?.sections).toHaveLength(1);
+  });
+  test('beginRename / endRename drive editingSectionId', () => {
+    openWithPlayer([['A', 10, 20]]);
+    commands.beginRename('a');
+    expect(store.editingSectionId.value).toBe('a');
+    commands.endRename();
+    expect(store.editingSectionId.value).toBeNull();
+  });
+  test('closeLesson clears editingSectionId', () => {
+    openWithPlayer([['A', 10, 20]]);
+    commands.beginRename('a');
+    commands.closeLesson();
+    expect(store.editingSectionId.value).toBeNull();
   });
   test('flip modes are exclusive and never touch the lesson', () => {
     openWithPlayer();
@@ -485,5 +520,25 @@ describe('tempo commands', () => {
     clock = 11_500;
     commands.tapTempo();
     expect(store.notice.value?.text).toBe('♩ tap ×1');
+  });
+
+  test('cycleCountIn goes 1 → 2 → 0 → 1', () => {
+    openWithPlayer();
+    commands.cycleCountIn();
+    expect(store.lesson.value?.countIn).toBe(2);
+    commands.cycleCountIn();
+    expect(store.lesson.value?.countIn).toBe(0);
+    commands.cycleCountIn();
+    expect(store.lesson.value?.countIn).toBe(1);
+  });
+  test('tapCount tracks the current run and resets on close', () => {
+    openWithPlayer();
+    for (const t of [0, 500]) {
+      clock = 10_000 + t;
+      commands.tapTempo();
+    }
+    expect(store.tapCount.value).toBe(2);
+    commands.closeLesson();
+    expect(store.tapCount.value).toBe(0);
   });
 });

@@ -30,7 +30,7 @@ const PLAIN: Record<string, [CommandName, ...unknown[]]> = {
   '=': ['rateStep', 1],
   '[': ['markStart'],
   ']': ['markEnd'],
-  g: ['cycleGap'],
+  g: ['cycleCountIn'],
   t: ['tapTempo'],
   m: ['toggleFlip', 'mirror'],
   r: ['toggleFlip', 'rotate'],

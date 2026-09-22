@@ -30,7 +30,7 @@ describe('keyToCommand', () => {
     [k('='), ['rateStep', 1]],
     [k('['), ['markStart']],
     [k(']'), ['markEnd']],
-    [k('g'), ['cycleGap']],
+    [k('g'), ['cycleCountIn']],
     [k('t'), ['tapTempo']],
     [k('T'), ['tapTempo']],
     [k('t', { inInput: true }), null],

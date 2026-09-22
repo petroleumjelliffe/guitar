@@ -71,6 +71,7 @@ export function createCommands(ctx: CommandContext) {
     store.activeSectionId.value = null;
     store.selectedSectionId.value = null;
     store.pendingStart.value = null;
+    store.editingSectionId.value = null;
     store.error.value = null;
     store.inputError.value = null;
     session?.engine.deactivate();
@@ -198,6 +199,8 @@ export function createCommands(ctx: CommandContext) {
       store.linkDiffers.value = false;
       savedSnapshot = null;
       taps = emptyTaps();
+      store.tapCount.value = 0;
+      store.editingSectionId.value = null;
       store.notice.value = null;
       store.error.value = null;
       store.currentTime.value = 0;
@@ -336,8 +339,9 @@ export function createCommands(ctx: CommandContext) {
       if (next !== undefined) commands.setRate(next);
     },
 
+    /** MARK is armed only while the video plays (spec §5.9). */
     markStart() {
-      if (!session) return;
+      if (!session || session.player.state() !== 'playing') return;
       store.pendingStart.value = roundTime(session.player.currentTime());
     },
 
@@ -352,7 +356,13 @@ export function createCommands(ctx: CommandContext) {
         });
         updateLesson(upsertSection(l, section, ctx.now()));
         store.pendingStart.value = null;
-        commands.jumpToSectionId(section.id);
+        // §5.9: pause where we are, select and arm the new section (loop on,
+        // no seek), and open its name for editing. The next Play runs the
+        // count-in into the section.
+        session.player.pause();
+        store.selectedSectionId.value = section.id;
+        session.engine.arm(section);
+        store.editingSectionId.value = section.id;
         return;
       }
       const active = activeSection();
@@ -367,19 +377,28 @@ export function createCommands(ctx: CommandContext) {
       if (moved) updateLesson(upsertSection(l, moved, ctx.now()));
     },
 
+    /** Move one edge to an absolute time (lane drag); same validity rule as nudge. */
+    setSectionEdge(id: string, edge: 'start' | 'end', seconds: number) {
+      const l = store.lesson.value;
+      const s = sections().find((x) => x.id === id);
+      if (!l || !s) return;
+      const moved = nudgeSection(s, edge, roundTime(seconds) - s[edge]);
+      if (moved) updateLesson(upsertSection(l, moved, ctx.now()));
+    },
+
     setGap(seconds: number) {
       const l = store.lesson.value;
       if (l) updateLesson({ ...l, gap: seconds, updatedAt: ctx.now() });
     },
 
-    cycleGap() {
-      const g = store.lesson.value?.gap ?? 0;
-      commands.setGap((g + 1) % 4);
-    },
-
     setCountIn(bars: CountIn) {
       const l = store.lesson.value;
       if (l) updateLesson({ ...l, countIn: bars, updatedAt: ctx.now() });
+    },
+
+    cycleCountIn() {
+      const c = store.lesson.value?.countIn ?? 1;
+      commands.setCountIn(((c + 1) % 3) as CountIn);
     },
 
     /** Tempo is per lesson: tap any time the player is attached, no section needed. */
@@ -390,6 +409,7 @@ export function createCommands(ctx: CommandContext) {
         return;
       }
       taps = tap(taps, ctx.now() * session.player.rate());
+      store.tapCount.value = taps.taps.length;
       const bpm = bpmFromTaps(taps);
       if (bpm === null) {
         store.notice.value = { text: `♩ tap ×${taps.taps.length}` };
@@ -423,6 +443,14 @@ export function createCommands(ctx: CommandContext) {
       store.selectedSectionId.value = id;
     },
 
+    beginRename(id: string) {
+      if (sections().some((s) => s.id === id)) store.editingSectionId.value = id;
+    },
+
+    endRename() {
+      store.editingSectionId.value = null;
+    },
+
     renameSection(id: string, name: string) {
       const l = store.lesson.value;
       const s = sections().find((x) => x.id === id);
@@ -436,6 +464,7 @@ export function createCommands(ctx: CommandContext) {
       lastDeleted = s;
       if (store.activeSectionId.value === s.id) session?.engine.deactivate();
       if (store.selectedSectionId.value === s.id) store.selectedSectionId.value = null;
+      if (store.editingSectionId.value === s.id) store.editingSectionId.value = null;
       updateLesson(removeSection(l, s.id, ctx.now()));
       store.notice.value = { text: `Deleted "${s.name}"`, action: { label: 'Undo', run: commands.undoDelete } };
     },
