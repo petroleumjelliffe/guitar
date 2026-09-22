@@ -1,20 +1,9 @@
-import { useEffect, useState } from 'preact/hooks';
 import { commands, store } from '../app';
 import { formatTime } from '../lesson/model';
-import type { FlipMode } from '../state/store';
-
-const FLIPS: Array<[FlipMode, string, string]> = [['normal', 'Normal', ''], ['mirror', 'Mirror', 'M'], ['rotate', 'Rotate', 'R']];
 
 export function Transport() {
   const lesson = store.lesson.value!;
   const playing = store.playerState.value === 'playing';
-  const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    if (!copied) return;
-    const t = setTimeout(() => setCopied(false), 1500);
-    return () => clearTimeout(t);
-  }, [copied]);
 
   return (
     <div class="transport">
@@ -71,21 +60,6 @@ export function Transport() {
         <span class="spacer" />
         <button onClick={() => commands.stepFrame(-1)} title=",">◀ frame</button>
         <button onClick={() => commands.stepFrame(1)} title=".">frame ▶</button>
-        <span class="label">View</span>
-        {FLIPS.map(([mode, label, key]) => (
-          <button key={mode} class={mode === store.flip.value ? 'active' : ''} onClick={() => commands.setFlip(mode)} title={key}>
-            {label}
-          </button>
-        ))}
-        <button
-          onClick={() => {
-            const url = commands.shareUrl();
-            const copy = navigator.clipboard?.writeText(url) ?? Promise.reject(new Error('no clipboard'));
-            copy.then(() => setCopied(true)).catch(() => window.prompt('Copy this link', url));
-          }}
-        >
-          {copied ? 'Copied' : 'Share link'}
-        </button>
       </div>
     </div>
   );

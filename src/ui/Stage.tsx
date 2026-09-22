@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'preact/hooks';
 import { commands, store } from '../app';
 import { YouTubePlayer } from '../player/youtube';
+import { VideoOverlay } from './VideoOverlay';
 
 export function Stage({ videoId }: { videoId: string }) {
   const wrap = useRef<HTMLDivElement>(null);
@@ -39,6 +40,7 @@ export function Stage({ videoId }: { videoId: string }) {
     <div class="stage">
       <div class="stage-video" style={{ transform }} ref={wrap} />
       <div class="stage-overlay" onClick={() => commands.togglePlay()} title="Click to play / pause" />
+      <VideoOverlay />
     </div>
   );
 }
