@@ -53,7 +53,6 @@ export function createCommands(ctx: CommandContext) {
   // Cleared on the first real edit (`updateLesson`) or on leaving the lesson.
   let savedSnapshot: Lesson | null = null;
   let taps: TapState = emptyTaps();
-  let tapTarget: string | null = null;
 
   const sections = () => store.lesson.value?.sections ?? [];
   const activeSection = () => sections().find((s) => s.id === store.activeSectionId.value) ?? null;
@@ -78,6 +77,8 @@ export function createCommands(ctx: CommandContext) {
     if (session) {
       session.engine.gap = lesson.gap;
       session.engine.countIn = lesson.countIn;
+      session.engine.bpm = lesson.bpm;
+      session.engine.beatsPerBar = lesson.beatsPerBar;
     }
     ctx.setHash(encodeLesson(lesson));
   }
@@ -103,6 +104,8 @@ export function createCommands(ctx: CommandContext) {
     if (session) {
       session.engine.gap = next.gap;
       session.engine.countIn = next.countIn;
+      session.engine.bpm = next.bpm;
+      session.engine.beatsPerBar = next.beatsPerBar;
       const active = next.sections.find((s) => s.id === store.activeSectionId.value);
       if (active) session.engine.setSection(active);
     }
@@ -195,7 +198,6 @@ export function createCommands(ctx: CommandContext) {
       store.linkDiffers.value = false;
       savedSnapshot = null;
       taps = emptyTaps();
-      tapTarget = null;
       store.notice.value = null;
       store.error.value = null;
       store.currentTime.value = 0;
@@ -213,6 +215,8 @@ export function createCommands(ctx: CommandContext) {
       if (lesson) {
         engine.gap = lesson.gap;
         engine.countIn = lesson.countIn;
+        engine.bpm = lesson.bpm;
+        engine.beatsPerBar = lesson.beatsPerBar;
         if (store.linkDiffers.value) {
           // Still showing an un-committed share link: apply the player's
           // title in memory only. Persisting here is exactly the bug that
@@ -378,16 +382,12 @@ export function createCommands(ctx: CommandContext) {
       if (l) updateLesson({ ...l, countIn: bars, updatedAt: ctx.now() });
     },
 
+    /** Tempo is per lesson: tap any time the player is attached, no section needed. */
     tapTempo() {
       const l = store.lesson.value;
-      const target = selectedOrActive();
-      if (!l || !target || !session) {
-        store.notice.value = { text: 'Select a section first' };
+      if (!l || !session) {
+        store.notice.value = { text: 'Open a video and press play, then tap on the beat' };
         return;
-      }
-      if (tapTarget !== target.id) {
-        taps = emptyTaps();
-        tapTarget = target.id;
       }
       taps = tap(taps, ctx.now() * session.player.rate());
       const bpm = bpmFromTaps(taps);
@@ -396,27 +396,23 @@ export function createCommands(ctx: CommandContext) {
         return;
       }
       store.notice.value = { text: `♩ ${bpm}` };
-      if (bpm !== target.bpm) updateLesson(upsertSection(l, { ...target, bpm }, ctx.now()));
+      if (bpm !== l.bpm) updateLesson({ ...l, bpm, updatedAt: ctx.now() });
     },
 
     setBpm(bpm: number) {
       const l = store.lesson.value;
-      const target = selectedOrActive();
-      if (!l || !target) return;
-      updateLesson(upsertSection(l, { ...target, bpm: normalizeBpm(bpm) }, ctx.now()));
+      if (l) updateLesson({ ...l, bpm: normalizeBpm(bpm), updatedAt: ctx.now() });
     },
 
     nudgeBpm(delta: -1 | 1) {
-      const target = selectedOrActive();
-      if (!target || target.bpm === 0) return;
-      commands.setBpm(target.bpm + delta);
+      const l = store.lesson.value;
+      if (!l || l.bpm === 0) return;
+      commands.setBpm(l.bpm + delta);
     },
 
     setBeatsPerBar(n: BeatsPerBar) {
       const l = store.lesson.value;
-      const target = selectedOrActive();
-      if (!l || !target) return;
-      updateLesson(upsertSection(l, { ...target, beatsPerBar: n }, ctx.now()));
+      if (l) updateLesson({ ...l, beatsPerBar: n, updatedAt: ctx.now() });
     },
 
     setFlip(mode: FlipMode) { store.flip.value = mode; },

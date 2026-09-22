@@ -18,7 +18,7 @@ live in your browser and may be lost when formats change.
 - Named, loopable sections; playback speed 0.25×–2× (0.05× steps
   between 0.75× and 1×), pitch preserved
 - Optional pause between loop repeats so you can reset your hand
-- Tap a section's tempo (`T`) and get a one- or two-bar click count-in before each loop restart
+- Tap the lesson's tempo (`T`) and get a one- or two-bar click count-in before each loop restart
 - ±0.1 s nudging of section start and end
 - Frame stepping while paused (`,` / `.`) to watch fingering closely
 - View modes — normal, mirror (`M`), rotate 180° (`R`) — so the
@@ -44,8 +44,8 @@ view; Apple Music as a second source.
 | `,` / `.` | Step one frame (paused) |
 | `-` / `=` | Speed down / up |
 | `[` / `]` | Mark start / mark end |
-| `G` | Cycle silent gap 0 → 1 → 2 → 3 s (used when the section has no tempo or count-in is off) |
-| `T` | Tap tempo for the selected section |
+| `G` | Cycle silent gap 0 → 1 → 2 → 3 s (used when the lesson has no tempo or count-in is off) |
+| `T` | Tap tempo (one tempo per lesson; tap any time while a video is open) |
 | `M` / `R` | Mirror / rotate 180° (press again for normal) |
 | `Delete` | Delete selected section (undo offered) |
 

@@ -20,7 +20,9 @@ export interface LoopState {
 export class LoopEngine {
   state: LoopState = { section: null, looping: false, gapUntil: null };
   gap = 0; // seconds of pause between repeats
-  countIn = 1; // bars of count-in for sections with a tempo
+  countIn = 1; // bars of count-in when the lesson has a tempo
+  bpm = 0; // lesson tempo; 0 = none (the seconds gap applies)
+  beatsPerBar = 4;
   clicker: ClickerPort | null = null;
   onChange: (() => void) | null = null;
 
@@ -102,13 +104,13 @@ export class LoopEngine {
     if (!looping || !section || this.player.state() !== 'playing') return;
     if (this.player.currentTime() < section.end) return;
 
-    if (section.bpm > 0 && this.countIn > 0) {
-      const beats = this.countIn * section.beatsPerBar;
-      const bpmAtRate = section.bpm * this.player.rate(); // speed is global; clicks follow it
+    if (this.bpm > 0 && this.countIn > 0) {
+      const beats = this.countIn * this.beatsPerBar;
+      const bpmAtRate = this.bpm * this.player.rate(); // speed is global; clicks follow it
       const now = this.now();
       this.player.pause();
       this.player.seek(section.start);
-      this.clicker?.countIn(bpmAtRate, beats, section.beatsPerBar, now);
+      this.clicker?.countIn(bpmAtRate, beats, this.beatsPerBar, now);
       this.set({ gapUntil: now + (beats * 60000) / bpmAtRate });
     } else if (this.gap > 0) {
       this.player.pause();

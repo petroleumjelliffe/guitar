@@ -4,7 +4,7 @@ import { FakeClicker } from '../audio/fake';
 import type { Section } from '../lesson/model';
 import { LoopEngine } from './engine';
 
-const section: Section = { id: 's1', name: 'Riff', start: 10, end: 20, bpm: 0, beatsPerBar: 4 };
+const section: Section = { id: 's1', name: 'Riff', start: 10, end: 20 };
 
 let player: FakePlayer;
 let clock: number;
@@ -218,10 +218,11 @@ describe('stepFrame', () => {
 });
 
 describe('count-in', () => {
-  const tempoed: Section = { ...section, bpm: 120, beatsPerBar: 4 };
+  const withTempo = () => { engine.bpm = 120; engine.beatsPerBar = 4; };
 
   test('at the section end: pauses, seeks to start, schedules one bar of clicks, waits a bar', () => {
-    engine.activate(tempoed);
+    withTempo();
+    engine.activate(section);
     engine.toggleLoop();
     player.time = 20.2;
     player.calls = [];
@@ -238,7 +239,9 @@ describe('count-in', () => {
   test('runs at bpm × the player\'s current rate and honours countIn bars and beatsPerBar', () => {
     engine.countIn = 2;
     player.r = 0.5;
-    engine.activate({ ...tempoed, beatsPerBar: 3 });
+    withTempo();
+    engine.beatsPerBar = 3;
+    engine.activate(section);
     engine.toggleLoop();
     player.time = 20.2;
     clicker.calls = [];
@@ -247,9 +250,9 @@ describe('count-in', () => {
     expect(engine.state.gapUntil).toBe(1000 + 6000); // 6 beats at 60 BPM
   });
 
-  test('falls back to the seconds gap when the section has no tempo', () => {
+  test('falls back to the seconds gap when the lesson has no tempo', () => {
     engine.gap = 2;
-    engine.activate(section); // bpm 0
+    engine.activate(section); // engine.bpm stays 0
     engine.toggleLoop();
     player.time = 20.2;
     clicker.calls = [];
@@ -261,7 +264,8 @@ describe('count-in', () => {
   test('falls back to the seconds gap when countIn is 0', () => {
     engine.countIn = 0;
     engine.gap = 1;
-    engine.activate(tempoed);
+    withTempo();
+    engine.activate(section);
     engine.toggleLoop();
     player.time = 20.2;
     clicker.calls = [];
@@ -272,7 +276,8 @@ describe('count-in', () => {
 
   test('with countIn 0 and gap 0 just seeks', () => {
     engine.countIn = 0;
-    engine.activate(tempoed);
+    withTempo();
+    engine.activate(section);
     engine.toggleLoop();
     player.time = 20.2;
     player.calls = [];
@@ -287,7 +292,8 @@ describe('count-in', () => {
     ['seek away', () => engine.seekTo(100)],
     ['activate another', () => engine.activate({ ...section, id: 'other' })],
   ])('%s during the count-in stops the clicks', (_name, interrupt) => {
-    engine.activate(tempoed);
+    withTempo();
+    engine.activate(section);
     engine.toggleLoop();
     player.time = 20.2;
     engine.tick();
@@ -299,7 +305,8 @@ describe('count-in', () => {
 
   test('works without a clicker', () => {
     engine.clicker = null;
-    engine.activate(tempoed);
+    withTempo();
+    engine.activate(section);
     engine.toggleLoop();
     player.time = 20.2;
     expect(() => engine.tick()).not.toThrow();

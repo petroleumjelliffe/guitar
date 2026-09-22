@@ -9,8 +9,6 @@ export interface Section {
   name: string;
   start: number;         // seconds, one decimal
   end: number;           // seconds, one decimal
-  bpm: number;           // 0 = no tempo; else integer in [BPM_MIN, BPM_MAX]
-  beatsPerBar: BeatsPerBar;
 }
 
 export interface Lesson {
@@ -19,7 +17,9 @@ export interface Lesson {
   title: string;
   sections: Section[];   // sorted by start
   gap: number;           // seconds of pause between repeats when a section has no tempo
-  countIn: CountIn;      // bars of count-in for sections with a tempo
+  countIn: CountIn;      // bars of count-in when the lesson has a tempo
+  bpm: number;           // 0 = no tempo; else integer in [BPM_MIN, BPM_MAX]
+  beatsPerBar: BeatsPerBar;
   updatedAt: number;     // epoch ms
 }
 
@@ -37,7 +37,7 @@ export function newId(): string {
 }
 
 export function createLesson(videoId: string, title = videoId, now = Date.now()): Lesson {
-  return { v: 1, videoId, title, sections: [], gap: 0, countIn: 1, updatedAt: now };
+  return { v: 1, videoId, title, sections: [], gap: 0, countIn: 1, bpm: 0, beatsPerBar: 4, updatedAt: now };
 }
 
 export function snapRate(rate: number, available: number[]): number {
@@ -61,12 +61,17 @@ export function normalizeBeatsPerBar(n: number): BeatsPerBar {
 export function normalizeSection(s: Section): Section {
   const start = roundTime(Math.max(0, s.start));
   const end = Math.max(roundTime(s.end), roundTime(start + MIN_SECTION_LENGTH));
-  return { ...s, start, end, bpm: normalizeBpm(s.bpm), beatsPerBar: normalizeBeatsPerBar(s.beatsPerBar) };
+  return { ...s, start, end };
 }
 
-/** Build a section with a fresh id and tempo defaults, then normalise it. */
+/** Clamp the lesson-level tempo fields. */
+export function normalizeLesson(l: Lesson): Lesson {
+  return { ...l, bpm: normalizeBpm(l.bpm), beatsPerBar: normalizeBeatsPerBar(l.beatsPerBar) };
+}
+
+/** Build a section with a fresh id, then normalise it. */
 export function createSection(fields: Pick<Section, 'name' | 'start' | 'end'> & Partial<Section>): Section {
-  return normalizeSection({ id: newId(), bpm: 0, beatsPerBar: 4, ...fields });
+  return normalizeSection({ id: newId(), ...fields });
 }
 
 export function sortSections(sections: Section[]): Section[] {

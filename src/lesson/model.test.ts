@@ -1,12 +1,12 @@
 import { describe, expect, test } from 'vitest';
 import {
   DEFAULT_RATES, MIN_SECTION_LENGTH, createLesson, createSection, formatTime, normalizeBeatsPerBar, normalizeBpm,
-  normalizeSection, nudge, removeSection, roundTime, snapRate, sortSections, upsertSection,
+  normalizeLesson, normalizeSection, nudge, removeSection, roundTime, snapRate, sortSections, upsertSection,
   type BeatsPerBar, type Section,
 } from './model';
 
 const sec = (over: Partial<Section> = {}): Section => ({
-  id: 'a', name: 'A', start: 10, end: 20, bpm: 0, beatsPerBar: 4, ...over,
+  id: 'a', name: 'A', start: 10, end: 20, ...over,
 });
 
 describe('roundTime', () => {
@@ -103,19 +103,17 @@ describe('tempo fields', () => {
     expect(normalizeBeatsPerBar(5)).toBe(4);
     expect(normalizeBeatsPerBar(0)).toBe(4);
   });
-  test('normalizeSection applies both', () => {
-    const s = normalizeSection(sec({ bpm: 400, beatsPerBar: 7 as BeatsPerBar }));
-    expect(s.bpm).toBe(300);
-    expect(s.beatsPerBar).toBe(4);
+  test('normalizeLesson clamps bpm and beatsPerBar', () => {
+    const l = normalizeLesson({ ...createLesson('dQw4w9WgXcQ'), bpm: 400, beatsPerBar: 7 as BeatsPerBar });
+    expect(l.bpm).toBe(300);
+    expect(l.beatsPerBar).toBe(4);
   });
-  test('createSection fills id and tempo defaults', () => {
+  test('createSection fills the id and honours an explicit one', () => {
     const s = createSection({ name: 'Riff', start: 1, end: 2 });
     expect(s.id).toMatch(/^[a-z0-9]{6}$/);
-    expect(s.bpm).toBe(0);
-    expect(s.beatsPerBar).toBe(4);
-    expect(createSection({ name: 'R', start: 1, end: 2, bpm: 90, beatsPerBar: 3 })).toMatchObject({ bpm: 90, beatsPerBar: 3 });
+    expect(createSection({ id: 'keep', name: 'R', start: 1, end: 2 }).id).toBe('keep');
   });
-  test('createLesson defaults countIn to 1', () => {
-    expect(createLesson('dQw4w9WgXcQ').countIn).toBe(1);
+  test('createLesson defaults countIn 1, bpm 0, beatsPerBar 4', () => {
+    expect(createLesson('dQw4w9WgXcQ')).toMatchObject({ countIn: 1, bpm: 0, beatsPerBar: 4 });
   });
 });

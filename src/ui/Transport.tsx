@@ -48,6 +48,15 @@ export function Transport() {
             {g === 0 ? 'none' : `${g}s`}
           </button>
         ))}
+        <span class="label">Tempo</span>
+        <button onClick={() => commands.tapTempo()} title="T — tap on the beat, 4+ times">Tap</button>
+        <button onClick={() => commands.nudgeBpm(-1)} disabled={lesson.bpm === 0}>−1</button>
+        <span class="time">{lesson.bpm === 0 ? '—' : `${lesson.bpm} BPM`}</span>
+        <button onClick={() => commands.nudgeBpm(1)} disabled={lesson.bpm === 0}>+1</button>
+        <button class={lesson.beatsPerBar === 3 ? 'active' : ''} onClick={() => commands.setBeatsPerBar(3)}>3/4</button>
+        <button class={lesson.beatsPerBar === 4 ? 'active' : ''} onClick={() => commands.setBeatsPerBar(4)}>4/4</button>
+      </div>
+      <div class="transport-row">
         <span class="label">Count-in</span>
         {([0, 1, 2] as const).map((bars) => (
           <button

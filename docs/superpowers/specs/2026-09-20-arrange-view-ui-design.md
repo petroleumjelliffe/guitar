@@ -158,8 +158,8 @@ Every action still goes through `commands`. New UI-only state
 
 One button cycling `off → 1 bar → 2 bars → off` via
 `commands.setCountIn`. Label shows the current value. Tooltip: "G".
-When the selected/active section has no tempo the button is drawn at
-50 % opacity with tooltip "Tap a tempo first (T)".
+When the lesson has no tempo the button is drawn at 50 % opacity with
+tooltip "Tap a tempo first (T)". Tempo is per lesson (2026-09-21).
 
 ### 5.4 LCD block
 
@@ -170,7 +170,7 @@ Three cells separated by 1 px dividers on `--lcd-bg`:
   Frame-accurate display is not possible: the IFrame API does not
   report the video's frame rate. Updated every tick.
 - **SPEED** — the gauge (§5.5) plus `0.80 x`.
-- **TEMPO** — `96 BPM`, or `TAP` when the section's bpm is 0, or
+- **TEMPO** — `96 BPM`, or `TAP` when the lesson's bpm is 0, or
   `tap ×N` while converging. The whole cell is a button:
   click = `commands.tapTempo()`. `−`/`+` 1 BPM appear on hover as tiny
   keys under the number (`nudgeBpm`).

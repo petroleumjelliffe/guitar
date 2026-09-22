@@ -1,4 +1,4 @@
-import { newId, normalizeSection, sortSections, type CountIn, type Lesson, type Section } from './model';
+import { newId, normalizeLesson, normalizeSection, sortSections, type CountIn, type Lesson, type Section } from './model';
 
 export type DecodeResult = { ok: true; lesson: Lesson } | { ok: false; error: string };
 
@@ -8,9 +8,11 @@ export function encodeLesson(lesson: Lesson): string {
   const parts = ['v=1', `id=${lesson.videoId}`];
   if (lesson.gap > 0) parts.push(`g=${lesson.gap}`);
   if (lesson.countIn !== 1) parts.push(`c=${lesson.countIn}`);
+  if (lesson.bpm !== 0) parts.push(`b=${lesson.bpm}`);
+  if (lesson.beatsPerBar !== 4) parts.push(`m=${lesson.beatsPerBar}`);
   for (const s of lesson.sections) {
     parts.push(
-      `s=${encodeURIComponent(s.name)},${s.start.toFixed(1)},${s.end.toFixed(1)},${s.bpm},${s.beatsPerBar}`,
+      `s=${encodeURIComponent(s.name)},${s.start.toFixed(1)},${s.end.toFixed(1)}`,
     );
   }
   return '#' + parts.join('&');
@@ -47,26 +49,43 @@ export function decodeLesson(hash: string, now = Date.now()): DecodeResult {
     countIn = Number(c) as CountIn;
   }
 
+  let bpm = 0;
+  const b = get('b');
+  if (b !== undefined) {
+    bpm = Number(b);
+    if (!Number.isFinite(bpm) || bpm < 0) return fail('Bad tempo');
+  }
+
+  let beatsPerBar = 4;
+  const m = get('m');
+  if (m !== undefined) {
+    beatsPerBar = Number(m);
+    if (!Number.isFinite(beatsPerBar)) return fail('Bad meter');
+  }
+
   const sections: Section[] = [];
   for (const [k, v] of pairs) {
     if (k !== 's') continue;
     const f = v.split(',');
-    if (f.length !== 5) return fail('Bad section');
+    if (f.length !== 3) return fail('Bad section');
     let name: string;
     try {
       name = decodeURIComponent(f[0]!);
     } catch {
       return fail('Bad section name');
     }
-    const [start, end, bpm, beatsPerBar] = f.slice(1).map(Number) as [number, number, number, number];
-    if (![start, end, bpm, beatsPerBar].every(Number.isFinite) || end <= start || bpm < 0) {
+    const [start, end] = f.slice(1).map(Number) as [number, number];
+    if (![start, end].every(Number.isFinite) || end <= start) {
       return fail('Bad section');
     }
-    sections.push(normalizeSection({ id: newId(), name, start, end, bpm, beatsPerBar: beatsPerBar as Section['beatsPerBar'] }));
+    sections.push(normalizeSection({ id: newId(), name, start, end }));
   }
 
   return {
     ok: true,
-    lesson: { v: 1, videoId, title: videoId, sections: sortSections(sections), gap, countIn, updatedAt: now },
+    lesson: normalizeLesson({
+      v: 1, videoId, title: videoId, sections: sortSections(sections), gap, countIn,
+      bpm, beatsPerBar: beatsPerBar as Lesson['beatsPerBar'], updatedAt: now,
+    }),
   };
 }

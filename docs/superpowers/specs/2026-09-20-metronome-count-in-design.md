@@ -18,10 +18,10 @@ learned by tap.
 
 | Question | Decision |
 |---|---|
-| Tempo source | Tap tempo (`T` or a button), stored per section. No audio analysis. |
+| Tempo source | Tap tempo (`T` or a button), **one tempo per lesson** (2026-09-21; was per section). No section needs to be selected. No audio analysis. |
 | Lead-in | Count-in bar(s), then play. No clicks during playback. |
 | Speed interaction | Count-in runs at `bpm × the player's current rate` (speed is global and session-only since 2026-09-21; `Section.rate` no longer exists). |
-| Meter | `beatsPerBar` per section: 2, 3, 4 or 6. Default 4. |
+| Meter | `beatsPerBar` per lesson: 2, 3, 4 or 6. Default 4. |
 | Sections without a tempo | Keep the seconds gap as today. |
 | UI scope | Engine, commands, hotkeys and two small control additions. A separate UI redesign is in progress; this feature must not restructure `ui/`. |
 | Audio | Web Audio, our own clicks, behind `ClickerPort`. Only `src/audio/` touches the audio API. |
@@ -34,8 +34,6 @@ interface Section {
   name: string;
   start: number;
   end: number;
-  bpm: number;         // integer 30–300, or 0 = no tempo set
-  beatsPerBar: 2 | 3 | 4 | 6;
 }
 
 interface Lesson {
@@ -44,7 +42,9 @@ interface Lesson {
   title: string;
   sections: Section[];
   gap: number;         // seconds, used when a section has bpm 0
-  countIn: 0 | 1 | 2;  // bars of count-in for sections with a tempo
+  countIn: 0 | 1 | 2;  // bars of count-in when the lesson has a tempo
+  bpm: number;         // integer 30–300, or 0 = no tempo set (lesson-level since 2026-09-21)
+  beatsPerBar: 2 | 3 | 4 | 6;
   updatedAt: number;
 }
 ```
@@ -57,9 +57,9 @@ Invariants (in `lesson/model.ts`, tested):
 
 ### Share URL
 
-Section field becomes exactly five comma parts (was six before speed went global):
-`s=<name>,<start>,<end>,<bpm>,<beatsPerBar>` (five parts; 2026-09-21). Lesson gains
-`c=<countIn>` (omitted when 1, the default). Decoder requires all five
+Section field is exactly three comma parts:
+`s=<name>,<start>,<end>` (three parts; 2026-09-21). Lesson gains `b=<bpm>` (omitted at 0), `m=<beatsPerBar>` (omitted at 4) and
+`c=<countIn>` (omitted when 1, the default). Decoder requires all three
 section parts and rejects otherwise (`Bad section`); `c` must be 0, 1
 or 2 (`Bad count-in`).
 
@@ -128,12 +128,12 @@ New members: `clicker: ClickerPort | null = null`, `countIn = 1` (bars).
 At a section end while looping (`tick()`):
 
 ```
-if section.bpm > 0 && countIn > 0:
-    beats = countIn * section.beatsPerBar
-    bpmAtRate = section.bpm * player.rate()      # global speed
+if lesson.bpm > 0 && countIn > 0:
+    beats = countIn * lesson.beatsPerBar
+    bpmAtRate = lesson.bpm * player.rate()      # global speed
     ms = beats * 60000 / bpmAtRate
     pause(); seek(section.start)
-    clicker?.countIn(bpmAtRate, beats, section.beatsPerBar, now)
+    clicker?.countIn(bpmAtRate, beats, lesson.beatsPerBar, now)
     gapUntil = now + ms
 else if gap > 0:                      # unchanged
     pause(); seek(start); gapUntil = now + gap*1000

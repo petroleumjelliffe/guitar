@@ -26,9 +26,7 @@ function isValidSection(s: unknown): boolean {
     typeof sec.id === 'string' &&
     typeof sec.name === 'string' &&
     typeof sec.start === 'number' &&
-    typeof sec.end === 'number' &&
-    typeof sec.bpm === 'number' &&
-    typeof sec.beatsPerBar === 'number'
+    typeof sec.end === 'number'
   );
 }
 
@@ -42,6 +40,8 @@ export function isValidLesson(l: unknown): l is Lesson {
     typeof lesson.title === 'string' &&
     typeof lesson.gap === 'number' &&
     (lesson.countIn === 0 || lesson.countIn === 1 || lesson.countIn === 2) &&
+    typeof lesson.bpm === 'number' &&
+    typeof lesson.beatsPerBar === 'number' &&
     typeof lesson.updatedAt === 'number' &&
     Array.isArray(lesson.sections) &&
     lesson.sections.every(isValidSection)

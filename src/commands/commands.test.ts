@@ -67,7 +67,7 @@ describe('openFromHash', () => {
     expect(store.error.value).toMatch(/invalid/i);
   });
   test('loads the link and flags when it differs from the saved copy', () => {
-    library.save(upsertSection(createLesson(ID, 'Saved'), { id: 'a', name: 'A', start: 0, end: 5, bpm: 0, beatsPerBar: 4 }));
+    library.save(upsertSection(createLesson(ID, 'Saved'), { id: 'a', name: 'A', start: 0, end: 5 }));
     expect(commands.openFromHash(`#v=1&id=${ID}&g=2`)).toBe(true);
     expect(store.lesson.value?.gap).toBe(2);
     expect(store.lesson.value?.title).toBe('Saved');
@@ -87,7 +87,7 @@ describe('openFromHash', () => {
     expect(store.linkDiffers.value).toBe(false);
   });
   test('attaching a player does not overwrite the saved copy; restoreSaved still works', () => {
-    library.save(upsertSection(createLesson(ID, 'Saved'), { id: 'a', name: 'A', start: 0, end: 5, bpm: 0, beatsPerBar: 4 }));
+    library.save(upsertSection(createLesson(ID, 'Saved'), { id: 'a', name: 'A', start: 0, end: 5 }));
     commands.openFromHash(`#v=1&id=${ID}&g=2`);
     commands.attachPlayer(player, 'Real title');
     vi.advanceTimersByTime(300);
@@ -206,7 +206,7 @@ describe('shareUrl / playerError', () => {
 function openWithPlayer(sections: Array<[string, number, number]> = []) {
   let l = createLesson(ID, 'T', 1);
   for (const [name, start, end] of sections) {
-    l = upsertSection(l, { id: name.toLowerCase(), name, start, end, bpm: 0, beatsPerBar: 4 }, 1);
+    l = upsertSection(l, { id: name.toLowerCase(), name, start, end }, 1);
   }
   library.save(l);
   commands.openLesson(ID);
@@ -414,83 +414,74 @@ describe('tempo commands', () => {
     expect(commands.session()?.engine.countIn).toBe(0);
   });
 
-  test('tapTempo needs a section', () => {
-    openWithPlayer();
+  test('tapTempo needs a player, not a section', () => {
+    commands.openLesson(ID); // no player attached
     commands.tapTempo();
-    expect(store.notice.value?.text).toMatch(/select a section/i);
+    expect(store.notice.value?.text).toMatch(/play/i);
+    expect(store.lesson.value?.bpm).toBe(0);
   });
 
-  test('tapTempo converges after four taps and persists the bpm on the section', () => {
+  test('tapTempo converges after four taps and persists the bpm on the lesson — no section needed', () => {
     openWithPlayer([['A', 10, 20]]);
-    commands.jumpToSection(1);
     for (const t of [0, 500, 1000]) {
       clock = 10_000 + t;
       commands.tapTempo();
     }
     expect(store.notice.value?.text).toBe('♩ tap ×3');
-    expect(store.lesson.value?.sections[0]?.bpm).toBe(0);
+    expect(store.lesson.value?.bpm).toBe(0);
     clock = 11_500;
     commands.tapTempo();
     expect(store.notice.value?.text).toBe('♩ 120');
-    expect(store.lesson.value?.sections[0]?.bpm).toBe(120);
+    expect(store.lesson.value?.bpm).toBe(120);
+    expect(commands.session()?.engine.bpm).toBe(120);
   });
 
   test('tapTempo scales wall time by the playback rate', () => {
-    openWithPlayer([['A', 10, 20]]);
-    commands.jumpToSection(1);
+    openWithPlayer();
     player.r = 0.5; // global speed set to 0.5×
     for (const t of [0, 1000, 2000, 3000]) {
       clock = 10_000 + t;
       commands.tapTempo();
     }
     // 1000 ms apart at 0.5× is 500 ms of song time → 120 BPM
-    expect(store.lesson.value?.sections[0]?.bpm).toBe(120);
+    expect(store.lesson.value?.bpm).toBe(120);
   });
 
-  test('tapTempo targets the selected section and resets taps when the target changes', () => {
-    openWithPlayer([['A', 10, 20], ['B', 30, 40]]);
-    commands.selectSection('a');
-    for (const t of [0, 500, 1000]) {
-      clock = 10_000 + t;
-      commands.tapTempo();
-    }
-    commands.selectSection('b');
-    clock = 11_500;
-    commands.tapTempo();
-    expect(store.notice.value?.text).toBe('♩ tap ×1');
-    expect(store.lesson.value?.sections.map((s) => s.bpm)).toEqual([0, 0]);
-  });
-
-  test('setBpm normalises; nudgeBpm steps and ignores untapped sections', () => {
-    openWithPlayer([['A', 10, 20]]);
-    commands.selectSection('a');
+  test('setBpm normalises; nudgeBpm steps and is ignored while untapped', () => {
+    openWithPlayer();
     commands.nudgeBpm(1);
-    expect(store.lesson.value?.sections[0]?.bpm).toBe(0);
+    expect(store.lesson.value?.bpm).toBe(0);
     commands.setBpm(119.6);
-    expect(store.lesson.value?.sections[0]?.bpm).toBe(120);
+    expect(store.lesson.value?.bpm).toBe(120);
     commands.nudgeBpm(-1);
-    expect(store.lesson.value?.sections[0]?.bpm).toBe(119);
+    expect(store.lesson.value?.bpm).toBe(119);
     commands.setBpm(5000);
-    expect(store.lesson.value?.sections[0]?.bpm).toBe(300);
+    expect(store.lesson.value?.bpm).toBe(300);
   });
 
-  test('setBeatsPerBar persists', () => {
-    openWithPlayer([['A', 10, 20]]);
-    commands.selectSection('a');
+  test('setBeatsPerBar persists and reaches the engine', () => {
+    openWithPlayer();
     commands.setBeatsPerBar(3);
-    expect(store.lesson.value?.sections[0]?.beatsPerBar).toBe(3);
+    expect(store.lesson.value?.beatsPerBar).toBe(3);
+    expect(commands.session()?.engine.beatsPerBar).toBe(3);
+  });
+
+  test('attachPlayer pushes the lesson tempo into the engine', () => {
+    library.save({ ...createLesson(ID), bpm: 90, beatsPerBar: 3 });
+    commands.openLesson(ID);
+    commands.attachPlayer(player, '');
+    expect(commands.session()?.engine.bpm).toBe(90);
+    expect(commands.session()?.engine.beatsPerBar).toBe(3);
   });
 
   test('closeLesson resets tap history', () => {
-    openWithPlayer([['A', 10, 20]]);
-    commands.jumpToSection(1);
+    openWithPlayer();
     for (const t of [0, 500, 1000]) {
       clock = 10_000 + t;
       commands.tapTempo();
     }
     commands.closeLesson();
-    openWithPlayer([['A', 10, 20]]);
-    commands.jumpToSection(1);
+    openWithPlayer();
     clock = 11_500;
     commands.tapTempo();
     expect(store.notice.value?.text).toBe('♩ tap ×1');
