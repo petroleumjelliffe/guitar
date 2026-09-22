@@ -1,8 +1,7 @@
 import { store } from '../app';
 import { LessonPicker } from './LessonPicker';
 import { Notice } from './Notice';
-import { SectionEditor } from './SectionEditor';
-import { SectionList } from './SectionList';
+import { SectionsPanel } from './SectionsPanel';
 import { Stage } from './Stage';
 import { Timeline } from './Timeline';
 import { Transport } from './Transport';
@@ -25,10 +24,7 @@ export function App() {
       <Timeline />
       <div class="lesson-body">
         <Transport />
-        <div class="lesson-side">
-          <SectionList />
-          <SectionEditor />
-        </div>
+        <SectionsPanel />
       </div>
     </main>
   );

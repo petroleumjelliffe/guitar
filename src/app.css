@@ -162,3 +162,21 @@ kbd { background: var(--panel); border: 1px solid #444; border-radius: 4px; padd
 .editor input { width: 100%; }
 .editor-row { display: flex; align-items: center; gap: 8px; }
 button.danger { color: var(--danger); }
+
+/* --- sections panel --- */
+.sections-panel { min-height: 0; }
+.panel-key { width: 22px; height: 19px; min-height: 0; padding: 0; border-radius: 4px; background: linear-gradient(#fdfdfc, #e6e4df); border: 1px solid #b6b3ac; font: 500 13px/1 var(--font); color: #444; }
+.panel-rows { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; }
+.row { display: flex; align-items: center; gap: 8px; padding: 0 10px; min-height: 36px; border-bottom: 1px solid var(--panel-line); font: 500 12px var(--font); color: var(--ink); }
+.row.active { background: var(--gold-row); box-shadow: inset 3px 0 0 var(--gold-bar); font-weight: 600; color: #20200c; }
+.row.selected { background: var(--gold-row); box-shadow: inset 3px 0 0 var(--gold-bar); opacity: .6; }
+.row.recording { background: var(--recording-row); box-shadow: inset 3px 0 0 var(--recording-bar); color: var(--recording-row-ink); }
+.row .dot { display: inline-block; width: 8px; height: 8px; border-radius: 4px; background: var(--recording-bar); margin-right: 4px; vertical-align: middle; }
+.row-jump { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; background: none; border: none; padding: 8px 0; min-height: 36px; text-align: left; color: inherit; font: inherit; }
+.row-num { width: 18px; color: var(--muted); font: 500 10px var(--mono); }
+.row-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.row-dur { margin-left: auto; font: 400 10px var(--mono); color: var(--muted); white-space: nowrap; }
+.row.active .row-dur { color: var(--gold-row-ink); }
+.name-field { flex: 1; min-width: 0; min-height: 28px; padding: 3px 6px; font: 500 12px var(--font); border-radius: 3px; border: 1.5px solid var(--focus); box-shadow: 0 0 0 2px rgba(63, 134, 196, .22); }
+.panel-foot { margin-top: auto; padding: 7px 10px; border-top: 1px solid #d5d2cb; background: var(--panel-foot); font: 400 10px var(--font); color: var(--muted); }
+@media (min-width: 720px) { .row-num { display: none; } }
