@@ -386,11 +386,6 @@ export function createCommands(ctx: CommandContext) {
       if (moved) updateLesson(upsertSection(l, moved, ctx.now()));
     },
 
-    setGap(seconds: number) {
-      const l = store.lesson.value;
-      if (l) updateLesson({ ...l, gap: seconds, updatedAt: ctx.now() });
-    },
-
     setCountIn(bars: CountIn) {
       const l = store.lesson.value;
       if (l) updateLesson({ ...l, countIn: bars, updatedAt: ctx.now() });

@@ -68,7 +68,7 @@ export function SpeedGauge() {
       {TICK_RATES.map((r) => {
         const [x1, y1] = polar(rateToAngle(r), 8.6);
         const [x2, y2] = polar(rateToAngle(r), r === 1 ? 13.4 : 12.6);
-        return <line key={r} x1={x1} y1={y1} x2={x2} y2={y2} stroke={r === 1 ? 'var(--lcd)' : '#2c5d4a'} stroke-width={r === 1 ? 1.6 : 1} stroke-linecap="round" />;
+        return <line key={r} x1={x1} y1={y1} x2={x2} y2={y2} stroke={r === 1 ? 'var(--lcd)' : 'var(--lcd-tick)'} stroke-width={r === 1 ? 1.6 : 1} stroke-linecap="round" />;
       })}
     </svg>
   );
