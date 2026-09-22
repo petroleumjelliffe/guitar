@@ -4,6 +4,13 @@ Date: 2026-09-18
 Status: approved through "Components"; the remaining sections were
 written from the brainstorm decisions and are the basis for the plan.
 
+> **Superseded 2026-09-21 — speed is global and session-only.** `Section.rate`
+> no longer exists: playback speed lives in the player, resets to 1× when a
+> lesson opens, and is never saved or shared. References below to a
+> per-section `rate` (§4 model and URL, §6 activate/rate rules, §7 marking,
+> §8 list/editor) are historical. The metronome and arrange-view specs are
+> current.
+
 ## 1. Goal
 
 Practise guitar along with YouTube lessons: slow a passage down, loop

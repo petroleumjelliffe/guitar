@@ -15,8 +15,8 @@ live in your browser and may be lost when formats change.
 
 ## Features
 
-- Named, loopable sections with a per-section speed (0.25×–2×, in
-  0.05× steps between 0.75× and 1×)
+- Named, loopable sections; playback speed 0.25×–2× (0.05× steps
+  between 0.75× and 1×), pitch preserved
 - Optional pause between loop repeats so you can reset your hand
 - Tap a section's tempo (`T`) and get a one- or two-bar click count-in before each loop restart
 - ±0.1 s nudging of section start and end

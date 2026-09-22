@@ -4,7 +4,7 @@ import { decodeLesson, encodeLesson } from './url';
 
 const ID = 'dQw4w9WgXcQ';
 const sec = (over: Partial<Section> = {}): Section => ({
-  id: 'x', name: 'Intro riff', start: 72, end: 94, rate: 0.75, bpm: 0, beatsPerBar: 4, ...over,
+  id: 'x', name: 'Intro riff', start: 72, end: 94, bpm: 0, beatsPerBar: 4, ...over,
 });
 
 describe('encodeLesson', () => {
@@ -12,7 +12,7 @@ describe('encodeLesson', () => {
     let l = createLesson(ID);
     l = { ...l, gap: 2 };
     l = upsertSection(l, sec());
-    expect(encodeLesson(l)).toBe(`#v=1&id=${ID}&g=2&s=Intro%20riff,72.0,94.0,0.75,0,4`);
+    expect(encodeLesson(l)).toBe(`#v=1&id=${ID}&g=2&s=Intro%20riff,72.0,94.0,0,4`);
   });
   test('omits gap when 0 and works with no sections', () => {
     expect(encodeLesson(createLesson(ID))).toBe(`#v=1&id=${ID}`);
@@ -22,7 +22,7 @@ describe('encodeLesson', () => {
 describe('decodeLesson', () => {
   test('round-trips names with commas, ampersands, percent and unicode', () => {
     let l = createLesson(ID);
-    l = upsertSection(l, sec({ id: 'a', name: 'Solo, bars 5&8 = 100% 🎸', start: 220, end: 242, rate: 0.5 }));
+    l = upsertSection(l, sec({ id: 'a', name: 'Solo, bars 5&8 = 100% 🎸', start: 220, end: 242 }));
     l = upsertSection(l, sec({ id: 'b' }));
     const r = decodeLesson(encodeLesson(l), 999);
     expect(r.ok).toBe(true);
@@ -30,8 +30,8 @@ describe('decodeLesson', () => {
     expect(r.lesson.videoId).toBe(ID);
     expect(r.lesson.updatedAt).toBe(999);
     expect(r.lesson.sections.map(({ id: _id, ...rest }) => rest)).toEqual([
-      { name: 'Intro riff', start: 72, end: 94, rate: 0.75, bpm: 0, beatsPerBar: 4 },
-      { name: 'Solo, bars 5&8 = 100% 🎸', start: 220, end: 242, rate: 0.5, bpm: 0, beatsPerBar: 4 },
+      { name: 'Intro riff', start: 72, end: 94, bpm: 0, beatsPerBar: 4 },
+      { name: 'Solo, bars 5&8 = 100% 🎸', start: 220, end: 242, bpm: 0, beatsPerBar: 4 },
     ]);
     expect(r.lesson.sections[0]!.id).not.toBe(r.lesson.sections[1]!.id);
   });
@@ -50,13 +50,12 @@ describe('decodeLesson', () => {
     ['#v=1', 'no valid video id'],
     ['#v=1&id=short', 'no valid video id'],
     [`#v=1&id=${ID}&g=abc`, 'Bad gap'],
-    [`#v=1&id=${ID}&s=A,1,2,1`, 'Bad section'],
-    [`#v=1&id=${ID}&s=A,x,2,1,0,4`, 'Bad section'],
-    [`#v=1&id=${ID}&s=A,5,2,1,0,4`, 'Bad section'],
-    [`#v=1&id=${ID}&s=A,1,2,0,0,4`, 'Bad section'],
-    [`#v=1&id=${ID}&s=%E0%A4%A,1,2,1,0,4`, 'Bad section name'],
-    [`#v=1&id=${ID}&s=A,1,2,1,x,4`, 'Bad section'],
-    [`#v=1&id=${ID}&s=A,1,2,1,-1,4`, 'Bad section'],
+    [`#v=1&id=${ID}&s=A,1,2,1,0,4`, 'Bad section'],
+    [`#v=1&id=${ID}&s=A,x,2,0,4`, 'Bad section'],
+    [`#v=1&id=${ID}&s=A,5,2,0,4`, 'Bad section'],
+    [`#v=1&id=${ID}&s=%E0%A4%A,1,2,0,4`, 'Bad section name'],
+    [`#v=1&id=${ID}&s=A,1,2,x,4`, 'Bad section'],
+    [`#v=1&id=${ID}&s=A,1,2,-1,4`, 'Bad section'],
     [`#v=1&id=${ID}&c=3`, 'Bad count-in'],
     [`#v=1&id=${ID}&c=x`, 'Bad count-in'],
   ])('rejects %s', (hash, message) => {
@@ -71,7 +70,7 @@ describe('tempo in the URL', () => {
     let l = { ...createLesson(ID), countIn: 2 as const } as Lesson;
     l = upsertSection(l, sec({ bpm: 96, beatsPerBar: 3 }));
     const encoded = encodeLesson(l);
-    expect(encoded).toBe(`#v=1&id=${ID}&c=2&s=Intro%20riff,72.0,94.0,0.75,96,3`);
+    expect(encoded).toBe(`#v=1&id=${ID}&c=2&s=Intro%20riff,72.0,94.0,96,3`);
     const r = decodeLesson(encoded);
     expect(r.ok && r.lesson.countIn).toBe(2);
     expect(r.ok && r.lesson.sections[0]).toMatchObject({ bpm: 96, beatsPerBar: 3 });
@@ -83,7 +82,7 @@ describe('tempo in the URL', () => {
     expect(r.ok && r.lesson.countIn).toBe(1);
   });
   test('normalises out-of-range tempo values on decode', () => {
-    const r = decodeLesson(`#v=1&id=${ID}&s=A,1,2,1,999,7`);
+    const r = decodeLesson(`#v=1&id=${ID}&s=A,1,2,999,7`);
     expect(r.ok && r.lesson.sections[0]).toMatchObject({ bpm: 300, beatsPerBar: 4 });
   });
 });

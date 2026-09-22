@@ -27,7 +27,6 @@ export function SectionList() {
                 <span class="section-num">{i + 1}</span>
                 <span class="section-name">{s.name}</span>
                 <span class="section-range">{formatTime(s.start)}–{formatTime(s.end)}</span>
-                <span class="section-rate">{s.rate}×</span>
               </button>
               <button class="link" onClick={() => commands.selectSection(selected ? null : s.id)}>
                 {selected ? 'Done' : 'Edit'}

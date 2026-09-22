@@ -319,13 +319,9 @@ export function createCommands(ctx: CommandContext) {
     setRate(rate: number) {
       if (!session) return;
       const snapped = snapRate(rate, session.player.availableRates());
+      // Speed is global and session-only: it lives in the player, never in the lesson.
       session.player.setRate(snapped);
       store.rate.value = snapped;
-      const l = store.lesson.value;
-      const active = activeSection();
-      if (l && active && active.rate !== snapped) {
-        updateLesson(upsertSection(l, { ...active, rate: snapped }, ctx.now()));
-      }
     },
 
     rateStep(dir: -1 | 1) {
@@ -348,7 +344,7 @@ export function createCommands(ctx: CommandContext) {
       const pending = store.pendingStart.value;
       if (pending !== null) {
         const section = createSection({
-          name: `Section ${l.sections.length + 1}`, start: pending, end, rate: session.player.rate(),
+          name: `Section ${l.sections.length + 1}`, start: pending, end,
         });
         updateLesson(upsertSection(l, section, ctx.now()));
         store.pendingStart.value = null;

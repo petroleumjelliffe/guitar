@@ -26,7 +26,7 @@ describe('Library', () => {
   test('list is newest first with counts', () => {
     const lib = new Library(new MemStorage());
     lib.save(createLesson('aaaaaaaaaaa', 'Old', 1));
-    lib.save({ ...createLesson('bbbbbbbbbbb', 'New', 2), sections: [{ id: 'x', name: 'S', start: 0, end: 1, rate: 1, bpm: 0, beatsPerBar: 4 }] });
+    lib.save({ ...createLesson('bbbbbbbbbbb', 'New', 2), sections: [{ id: 'x', name: 'S', start: 0, end: 1, bpm: 0, beatsPerBar: 4 }] });
     expect(lib.list()).toEqual([
       { videoId: 'bbbbbbbbbbb', title: 'New', sectionCount: 1, updatedAt: 2 },
       { videoId: 'aaaaaaaaaaa', title: 'Old', sectionCount: 0, updatedAt: 1 },
@@ -76,7 +76,7 @@ describe('Library', () => {
 
   test('a valid lesson with all new fields still loads', () => {
     const storage = new MemStorage();
-    const l = { ...createLesson('dQw4w9WgXcQ', 'New', 1), sections: [{ id: 'x', name: 'S', start: 0, end: 1, rate: 1, bpm: 120, beatsPerBar: 4 as const }] };
+    const l = { ...createLesson('dQw4w9WgXcQ', 'New', 1), sections: [{ id: 'x', name: 'S', start: 0, end: 1, bpm: 120, beatsPerBar: 4 as const }] };
     storage.setItem(LIBRARY_KEY, JSON.stringify({ v: 1, lessons: { [l.videoId]: l } }));
     const reloaded = new Library(storage);
     expect(reloaded.get('dQw4w9WgXcQ')).toEqual(l);

@@ -27,7 +27,6 @@ function isValidSection(s: unknown): boolean {
     typeof sec.name === 'string' &&
     typeof sec.start === 'number' &&
     typeof sec.end === 'number' &&
-    typeof sec.rate === 'number' &&
     typeof sec.bpm === 'number' &&
     typeof sec.beatsPerBar === 'number'
   );

@@ -9,7 +9,6 @@ export interface Section {
   name: string;
   start: number;         // seconds, one decimal
   end: number;           // seconds, one decimal
-  rate: number;          // playback rate applied when activated
   bpm: number;           // 0 = no tempo; else integer in [BPM_MIN, BPM_MAX]
   beatsPerBar: BeatsPerBar;
 }
@@ -66,7 +65,7 @@ export function normalizeSection(s: Section): Section {
 }
 
 /** Build a section with a fresh id and tempo defaults, then normalise it. */
-export function createSection(fields: Pick<Section, 'name' | 'start' | 'end' | 'rate'> & Partial<Section>): Section {
+export function createSection(fields: Pick<Section, 'name' | 'start' | 'end'> & Partial<Section>): Section {
   return normalizeSection({ id: newId(), bpm: 0, beatsPerBar: 4, ...fields });
 }
 

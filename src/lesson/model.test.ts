@@ -6,7 +6,7 @@ import {
 } from './model';
 
 const sec = (over: Partial<Section> = {}): Section => ({
-  id: 'a', name: 'A', start: 10, end: 20, rate: 1, bpm: 0, beatsPerBar: 4, ...over,
+  id: 'a', name: 'A', start: 10, end: 20, bpm: 0, beatsPerBar: 4, ...over,
 });
 
 describe('roundTime', () => {
@@ -109,11 +109,11 @@ describe('tempo fields', () => {
     expect(s.beatsPerBar).toBe(4);
   });
   test('createSection fills id and tempo defaults', () => {
-    const s = createSection({ name: 'Riff', start: 1, end: 2, rate: 1 });
+    const s = createSection({ name: 'Riff', start: 1, end: 2 });
     expect(s.id).toMatch(/^[a-z0-9]{6}$/);
     expect(s.bpm).toBe(0);
     expect(s.beatsPerBar).toBe(4);
-    expect(createSection({ name: 'R', start: 1, end: 2, rate: 1, bpm: 90, beatsPerBar: 3 })).toMatchObject({ bpm: 90, beatsPerBar: 3 });
+    expect(createSection({ name: 'R', start: 1, end: 2, bpm: 90, beatsPerBar: 3 })).toMatchObject({ bpm: 90, beatsPerBar: 3 });
   });
   test('createLesson defaults countIn to 1', () => {
     expect(createLesson('dQw4w9WgXcQ').countIn).toBe(1);

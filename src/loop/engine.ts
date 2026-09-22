@@ -37,7 +37,6 @@ export class LoopEngine {
 
   activate(section: Section): void {
     this.stopClicks();
-    this.player.setRate(section.rate);
     this.player.seek(section.start);
     this.player.play();
     this.set({ section, gapUntil: null });
@@ -105,7 +104,7 @@ export class LoopEngine {
 
     if (section.bpm > 0 && this.countIn > 0) {
       const beats = this.countIn * section.beatsPerBar;
-      const bpmAtRate = section.bpm * section.rate;
+      const bpmAtRate = section.bpm * this.player.rate(); // speed is global; clicks follow it
       const now = this.now();
       this.player.pause();
       this.player.seek(section.start);

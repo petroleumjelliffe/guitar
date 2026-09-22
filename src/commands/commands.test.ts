@@ -67,7 +67,7 @@ describe('openFromHash', () => {
     expect(store.error.value).toMatch(/invalid/i);
   });
   test('loads the link and flags when it differs from the saved copy', () => {
-    library.save(upsertSection(createLesson(ID, 'Saved'), { id: 'a', name: 'A', start: 0, end: 5, rate: 1, bpm: 0, beatsPerBar: 4 }));
+    library.save(upsertSection(createLesson(ID, 'Saved'), { id: 'a', name: 'A', start: 0, end: 5, bpm: 0, beatsPerBar: 4 }));
     expect(commands.openFromHash(`#v=1&id=${ID}&g=2`)).toBe(true);
     expect(store.lesson.value?.gap).toBe(2);
     expect(store.lesson.value?.title).toBe('Saved');
@@ -87,7 +87,7 @@ describe('openFromHash', () => {
     expect(store.linkDiffers.value).toBe(false);
   });
   test('attaching a player does not overwrite the saved copy; restoreSaved still works', () => {
-    library.save(upsertSection(createLesson(ID, 'Saved'), { id: 'a', name: 'A', start: 0, end: 5, rate: 1, bpm: 0, beatsPerBar: 4 }));
+    library.save(upsertSection(createLesson(ID, 'Saved'), { id: 'a', name: 'A', start: 0, end: 5, bpm: 0, beatsPerBar: 4 }));
     commands.openFromHash(`#v=1&id=${ID}&g=2`);
     commands.attachPlayer(player, 'Real title');
     vi.advanceTimersByTime(300);
@@ -203,10 +203,10 @@ describe('shareUrl / playerError', () => {
   });
 });
 
-function openWithPlayer(sections: Array<[string, number, number, number?]> = []) {
+function openWithPlayer(sections: Array<[string, number, number]> = []) {
   let l = createLesson(ID, 'T', 1);
-  for (const [name, start, end, rate] of sections) {
-    l = upsertSection(l, { id: name.toLowerCase(), name, start, end, rate: rate ?? 1, bpm: 0, beatsPerBar: 4 }, 1);
+  for (const [name, start, end] of sections) {
+    l = upsertSection(l, { id: name.toLowerCase(), name, start, end, bpm: 0, beatsPerBar: 4 }, 1);
   }
   library.save(l);
   commands.openLesson(ID);
@@ -222,9 +222,9 @@ describe('playback commands', () => {
     expect(player.calls).toEqual(['play', 'pause']);
   });
   test('jumpToSection activates and selects', () => {
-    openWithPlayer([['A', 10, 20, 0.5], ['B', 30, 40]]);
+    openWithPlayer([['A', 10, 20], ['B', 30, 40]]);
     commands.jumpToSection(2);
-    expect(player.calls).toEqual(['rate:1', 'seek:30', 'play']);
+    expect(player.calls).toEqual(['seek:30', 'play']);
     expect(store.activeSectionId.value).toBe('b');
     expect(store.selectedSectionId.value).toBe('b');
   });
@@ -278,18 +278,14 @@ describe('playback commands', () => {
 });
 
 describe('rate commands', () => {
-  test('setRate snaps and persists on the active section', () => {
+  test('setRate snaps and only changes the player — speed is global and never saved', () => {
     openWithPlayer([['A', 10, 20]]);
     commands.jumpToSection(1);
+    const before = store.lesson.value;
     commands.setRate(0.82);
     expect(player.r).toBe(0.8);
-    expect(store.lesson.value?.sections[0]?.rate).toBe(0.8);
-  });
-  test('setRate without an active section only changes the player', () => {
-    openWithPlayer([['A', 10, 20]]);
-    commands.setRate(0.5);
-    expect(player.r).toBe(0.5);
-    expect(store.lesson.value?.sections[0]?.rate).toBe(1);
+    expect(store.rate.value).toBe(0.8);
+    expect(store.lesson.value).toBe(before);
   });
   test('rateStep moves through available rates and stops at the ends', () => {
     openWithPlayer();
@@ -314,11 +310,11 @@ describe('marking and editing', () => {
     player.time = 20.06;
     commands.markEnd();
     const s = store.lesson.value!.sections[0]!;
-    expect(s).toMatchObject({ name: 'Section 1', start: 12.3, end: 20.1, rate: 0.75 });
+    expect(s).toMatchObject({ name: 'Section 1', start: 12.3, end: 20.1 });
     expect(store.pendingStart.value).toBeNull();
     expect(store.selectedSectionId.value).toBe(s.id);
     expect(store.activeSectionId.value).toBe(s.id);
-    expect(player.calls).toEqual(['rate:0.75', 'seek:12.3', 'play']);
+    expect(player.calls).toEqual(['seek:12.3', 'play']);
   });
   test('markEnd without a pending start updates the active section end', () => {
     openWithPlayer([['A', 10, 20]]);
@@ -440,8 +436,9 @@ describe('tempo commands', () => {
   });
 
   test('tapTempo scales wall time by the playback rate', () => {
-    openWithPlayer([['A', 10, 20, 0.5]]);
-    commands.jumpToSection(1); // applies rate 0.5
+    openWithPlayer([['A', 10, 20]]);
+    commands.jumpToSection(1);
+    player.r = 0.5; // global speed set to 0.5×
     for (const t of [0, 1000, 2000, 3000]) {
       clock = 10_000 + t;
       commands.tapTempo();

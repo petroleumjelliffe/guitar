@@ -10,7 +10,7 @@ export function encodeLesson(lesson: Lesson): string {
   if (lesson.countIn !== 1) parts.push(`c=${lesson.countIn}`);
   for (const s of lesson.sections) {
     parts.push(
-      `s=${encodeURIComponent(s.name)},${s.start.toFixed(1)},${s.end.toFixed(1)},${s.rate},${s.bpm},${s.beatsPerBar}`,
+      `s=${encodeURIComponent(s.name)},${s.start.toFixed(1)},${s.end.toFixed(1)},${s.bpm},${s.beatsPerBar}`,
     );
   }
   return '#' + parts.join('&');
@@ -51,18 +51,18 @@ export function decodeLesson(hash: string, now = Date.now()): DecodeResult {
   for (const [k, v] of pairs) {
     if (k !== 's') continue;
     const f = v.split(',');
-    if (f.length !== 6) return fail('Bad section');
+    if (f.length !== 5) return fail('Bad section');
     let name: string;
     try {
       name = decodeURIComponent(f[0]!);
     } catch {
       return fail('Bad section name');
     }
-    const [start, end, rate, bpm, beatsPerBar] = f.slice(1).map(Number) as [number, number, number, number, number];
-    if (![start, end, rate, bpm, beatsPerBar].every(Number.isFinite) || end <= start || rate <= 0 || bpm < 0) {
+    const [start, end, bpm, beatsPerBar] = f.slice(1).map(Number) as [number, number, number, number];
+    if (![start, end, bpm, beatsPerBar].every(Number.isFinite) || end <= start || bpm < 0) {
       return fail('Bad section');
     }
-    sections.push(normalizeSection({ id: newId(), name, start, end, rate, bpm, beatsPerBar: beatsPerBar as Section['beatsPerBar'] }));
+    sections.push(normalizeSection({ id: newId(), name, start, end, bpm, beatsPerBar: beatsPerBar as Section['beatsPerBar'] }));
   }
 
   return {

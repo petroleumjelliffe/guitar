@@ -4,7 +4,7 @@ import { FakeClicker } from '../audio/fake';
 import type { Section } from '../lesson/model';
 import { LoopEngine } from './engine';
 
-const section: Section = { id: 's1', name: 'Riff', start: 10, end: 20, rate: 0.75, bpm: 0, beatsPerBar: 4 };
+const section: Section = { id: 's1', name: 'Riff', start: 10, end: 20, bpm: 0, beatsPerBar: 4 };
 
 let player: FakePlayer;
 let clock: number;
@@ -20,9 +20,9 @@ beforeEach(() => {
 });
 
 describe('activate', () => {
-  test('sets rate, seeks to start, plays, and records the section', () => {
+  test('seeks to start, plays, and records the section (speed is global, not per section)', () => {
     engine.activate(section);
-    expect(player.calls).toEqual(['rate:0.75', 'seek:10', 'play']);
+    expect(player.calls).toEqual(['seek:10', 'play']);
     expect(engine.state.section).toEqual(section);
   });
   test('calls onChange', () => {
@@ -218,7 +218,7 @@ describe('stepFrame', () => {
 });
 
 describe('count-in', () => {
-  const tempoed: Section = { ...section, bpm: 120, beatsPerBar: 4, rate: 1 };
+  const tempoed: Section = { ...section, bpm: 120, beatsPerBar: 4 };
 
   test('at the section end: pauses, seeks to start, schedules one bar of clicks, waits a bar', () => {
     engine.activate(tempoed);
@@ -235,9 +235,10 @@ describe('count-in', () => {
     expect(player.calls).toEqual(['pause', 'seek:10', 'play']);
   });
 
-  test('runs at bpm × rate and honours countIn bars and beatsPerBar', () => {
+  test('runs at bpm × the player\'s current rate and honours countIn bars and beatsPerBar', () => {
     engine.countIn = 2;
-    engine.activate({ ...tempoed, rate: 0.5, beatsPerBar: 3 });
+    player.r = 0.5;
+    engine.activate({ ...tempoed, beatsPerBar: 3 });
     engine.toggleLoop();
     player.time = 20.2;
     clicker.calls = [];
