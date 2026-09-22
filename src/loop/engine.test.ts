@@ -34,6 +34,9 @@ describe('activate', () => {
 });
 
 describe('tick without gap', () => {
+  beforeEach(() => {
+    engine.countIn = 0; // disable count-in fallback for these tests
+  });
   test('does nothing when not looping', () => {
     engine.activate(section);
     player.time = 25;
@@ -251,6 +254,7 @@ describe('count-in', () => {
   });
 
   test('falls back to the seconds gap when the lesson has no tempo', () => {
+    engine.countIn = 0;
     engine.gap = 2;
     engine.activate(section); // engine.bpm stays 0
     engine.toggleLoop();
@@ -258,7 +262,7 @@ describe('count-in', () => {
     clicker.calls = [];
     engine.tick();
     expect(clicker.calls).toEqual([]);
-    expect(engine.state.gapUntil).toBe(3000);
+    expect(engine.state.gapUntil).toBe(1000 + 2000);
   });
 
   test('falls back to the seconds gap when countIn is 0', () => {
@@ -311,5 +315,54 @@ describe('count-in', () => {
     player.time = 20.2;
     expect(() => engine.tick()).not.toThrow();
     expect(engine.state.gapUntil).toBe(3000);
+  });
+});
+
+describe('arm', () => {
+  test('activates and loops without touching the player', () => {
+    let n = 0;
+    engine.onChange = () => n++;
+    engine.arm(section);
+    expect(player.calls).toEqual([]);
+    expect(engine.state.section).toEqual(section);
+    expect(engine.state.looping).toBe(true);
+    expect(engine.state.gapUntil).toBeNull();
+    expect(n).toBe(1);
+  });
+  test('stops any pending clicks', () => {
+    engine.arm(section);
+    expect(clicker.calls).toEqual(['stop']);
+  });
+  test('the next play-through past the end restarts through the normal loop path', () => {
+    engine.gap = 1;
+    engine.arm(section);
+    player.play();
+    player.time = 20.5;
+    player.calls = [];
+    engine.tick();
+    expect(player.calls).toEqual(['pause', 'seek:10']);
+  });
+});
+
+describe('count-in fallback without a tempo', () => {
+  test('countIn bars become a silent gap of 2 s per bar', () => {
+    engine.countIn = 2;
+    engine.gap = 0;
+    engine.activate(section);
+    engine.toggleLoop();
+    player.time = 20.2;
+    clicker.calls = [];
+    engine.tick();
+    expect(clicker.calls).toEqual([]);
+    expect(engine.state.gapUntil).toBe(1000 + 4000);
+  });
+  test('the seconds gap applies only when countIn is 0', () => {
+    engine.countIn = 0;
+    engine.gap = 3;
+    engine.activate(section);
+    engine.toggleLoop();
+    player.time = 20.2;
+    engine.tick();
+    expect(engine.state.gapUntil).toBe(1000 + 3000);
   });
 });

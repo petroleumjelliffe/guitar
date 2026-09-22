@@ -44,6 +44,16 @@ export class LoopEngine {
     this.set({ section, gapUntil: null });
   }
 
+  /**
+   * Make `section` the active, looping section without seeking or playing.
+   * Used right after END: the playhead stays where it is, and the next Play
+   * runs past the section end into the count-in and then the section.
+   */
+  arm(section: Section): void {
+    this.stopClicks();
+    this.set({ section, looping: true, gapUntil: null });
+  }
+
   deactivate(): void {
     this.stopClicks();
     this.set({ section: null, gapUntil: null });
@@ -112,12 +122,17 @@ export class LoopEngine {
       this.player.seek(section.start);
       this.clicker?.countIn(bpmAtRate, beats, this.beatsPerBar, now);
       this.set({ gapUntil: now + (beats * 60000) / bpmAtRate });
-    } else if (this.gap > 0) {
-      this.player.pause();
-      this.player.seek(section.start);
-      this.set({ gapUntil: this.now() + this.gap * 1000 });
     } else {
-      this.player.seek(section.start);
+      // No tempo: count-in bars fall back to a silent 2 s per bar; the
+      // seconds gap applies only when count-in is off.
+      const waitMs = this.countIn > 0 ? this.countIn * 2000 : this.gap * 1000;
+      if (waitMs > 0) {
+        this.player.pause();
+        this.player.seek(section.start);
+        this.set({ gapUntil: this.now() + waitMs });
+      } else {
+        this.player.seek(section.start);
+      }
     }
   }
 }
