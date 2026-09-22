@@ -1,9 +1,12 @@
 # Arrange-view UI — design
 
 Date: 2026-09-20
-Status: approved 2026-09-20 (§9 decisions confirmed, §10 answered). Derived from the Claude Design project
-"Loop Lesson Wireframes" (`design/wireframes/Loop Lesson Wireframes.dc.html`,
-turns 1–3). Target: option **3a** (arrange view, LCD speed gauge) on
+Status: approved 2026-09-20 (§9 decisions confirmed, §10 answered);
+amended 2026-09-21 for global speed (§2, §5.5, §6) and the designer's
+"Section Recording Flow" (§5.9). Derived from the Claude Design project
+"Loop Lesson Wireframes" — `Loop Lesson Wireframes.dc.html` (turns 1–3,
+copy in `design/wireframes/`) and `Section Recording Flow.dc.html`
+(three-step MARK → END → name flow). Target: option **3a** (arrange view, LCD speed gauge) on
 desktop; option **1e** (stacked, chunky) under 720 px. Option 2a's
 horizontal speed fader is the superseded alternative.
 
@@ -27,11 +30,11 @@ faster path for editing.
 |---|---|---|
 | Layout | Video, then rows of buttons, then list + editor | Video + sections panel side by side; transport strip; arrange lane |
 | Theme | Dark (#111) everywhere | Warm light chrome (#d8d5cf / #f6f5f2) with a dark transport strip and green-on-black LCDs |
-| Speed | 12 buttons | Circular gauge in the LCD block, 0.25–2.00 in 0.05 steps, drag/scroll; `-`/`=` step 0.05 |
-| Marking | `+ mark start` / `+ mark end` | **Record** (red ●) starts a section at the playhead; the block grows; **END** closes it. `[`/`]` unchanged |
+| Speed | 12 buttons, persisted per section | Circular gauge in the LCD block, 0.25–2.00 in 0.05 steps, drag/scroll; `-`/`=` step 0.05. **Global and session-only** (decided 2026-09-21): `Section.rate` is removed, speed lives in the player and resets to 1× when a lesson opens |
+| Marking | `+ mark start` / `+ mark end` | **MARK** (armed while playing) starts a section at the playhead; the block grows; **END** closes it, pauses, arms the loop and focuses the name (§5.9). `[`/`]` unchanged |
 | Editing edges | ±0.1 buttons in an editor panel | In/Out edge selector + ◀ ▶ nudges beside the lane, plus dragging the block's edge with snapping |
 | Timeline | Full-length bar | Zoomable lane with ruler; zoom slider, scroll to pan |
-| Section list | Rows with Edit toggle | Rows: grip · name · range · ×rate; double-click renames inline; `+`/`−` in the header |
+| Section list | Rows with Edit toggle | Rows: name · duration; double-click renames inline; `+` in the header (delete via `Delete` key or the lane's context) |
 | Gap | 0/1/2/3 s buttons | COUNT IN button (off / 1 bar / 2 bars); seconds gap no longer in the UI (see §9) |
 | Loop / restart / play | Text buttons | Icon buttons in the transport group |
 | Mirror / rotate, frame step, share, library | Buttons in rows | Overlay pill in the video's bottom corner (§5.7) |
@@ -126,17 +129,18 @@ Every action still goes through `commands`. New UI-only state
 
 ### 5.1 Sections panel
 
-- Header `SECTIONS` with `+` and `−`. `+` = `commands.markStart()`
-  (starts recording at the playhead, same as Record); `−` =
-  `commands.deleteSection()` (selected-or-active; undo notice as now).
-- Row: drag grip (decorative in this pass), name, `start – end`
-  (tenths), `×rate`. Click a row → `jumpToSectionId`. The active
-  section's row is gold with the left bar; a selected-but-inactive row
-  (after Edit-edge changes or a click on the lane) uses the same gold at
-  60 % opacity.
-- Double-click the name → inline `<input>` (Enter/blur commits via
-  `renameSection`, Escape cancels). Hotkeys are already suppressed
-  while it has focus.
+- Header `SECTIONS` with `+` (= `commands.markStart()`, same as MARK;
+  disabled when not playing). No `−`: delete is the `Delete` key on the
+  selected section (undo notice as now).
+- Row: name · duration (`7.2s`, tenths). No range, no rate (speed is
+  global). Click a row → `jumpToSectionId`. The active section's row is
+  gold with the left bar; a selected-but-inactive row uses the same
+  gold at 60 % opacity. While recording, a provisional last row reads
+  `● Recording…  4.2s` in the red tint (`#fdece8`, bar `#c0402f`).
+- Double-click the name (or the section's region in the lane) → inline
+  `<input>` (Enter/blur commits via `renameSection`, Escape reverts).
+  Hotkeys are already suppressed while it has focus. The same input is
+  focused automatically after END (§5.9).
 - Footer hint: "Double-click to rename · click to jump".
 - Numbers: rows are numbered 1–9 in the narrow layout only (matches
   the `1`–`9` hotkeys); desktop rows omit the number.
@@ -148,7 +152,7 @@ Every action still goes through `commands`. New UI-only state
 | ⏮ | `restartSection` | — |
 | ▶ / ❚❚ | `togglePlay` | green glow while `playerState === 'playing'` |
 | ⟳ | `toggleLoop` | gold while `looping`; pulses (opacity 0.6↔1, 0.5 s) while `inGap` |
-| ● **REC** / ■ **END** | `markStart` / `markEnd` | The same button: shows ● REC when nothing is pending; while `pendingStart !== null` it shows ■ END and the lane shows the growing "Recording…" block |
+| ● **MARK** / ■ **END** | `markStart` / `markEnd` | One button. Idle: dark red-brown key (`#5e4240→#4a3230`, ink `#e7c9c5`, red dot) reading MARK, **enabled only while playing**. Recording: `--rec` red, glowing, reading END; works playing or paused. The ⟳ loop button is disabled (45 % opacity) while recording. |
 
 ### 5.3 COUNT IN
 
@@ -214,8 +218,15 @@ ticks every 0.10 from 0.5 to 1.5 plus the two ends. Interactions:
   (then 0.1 s). While dragging, the block redraws live from local
   state; the lesson is updated once on release.
 - **Recording block**: when `pendingStart !== null`, a striped red
-  block from `pendingStart` to `currentTime`, label "Recording…".
-- **Playhead**: 1.5 px white line with glow, full lane height.
+  block from `pendingStart` to `currentTime`, labelled with its running
+  duration (`4.2s`). The playhead turns red (`#ff8d76`, glow
+  `rgba(255,120,90,.7)`) and the LCD block's border glows red
+  (`#5c2a22`, `0 0 8px rgba(230,90,70,.25)`).
+- **Playhead**: 1.5 px white line with glow, full lane height; grey
+  (`#cfcdc8`, no glow) while paused.
+- **Follow rule**: while playing, the view scrolls to keep the playhead
+  inside the middle 60 %; while recording it is pinned at ~65 % and the
+  ruler scrolls under it.
 
 `setSectionEdge` is a new command (a `nudge` with an absolute value;
 same normalisation, same `updateLesson` path).
@@ -233,6 +244,30 @@ guitar, and touch has no hover); at narrow widths it collapses to
 icons only. The video title becomes a one-line caption under the
 video; the page header goes away.
 
+### 5.9 Section recording flow (from "Section Recording Flow")
+
+1. **Playing, ready.** MARK armed (enabled) whenever `playerState ===
+   'playing'`; disabled otherwise. Nothing selected.
+2. **Recording** (`pendingStart !== null`). MARK reads END; loop button
+   disabled; red playhead pinned, ruler scrolling; the lane shows the
+   growing red block with its duration; the list shows the provisional
+   `Recording…` row. END is allowed playing or paused.
+3. **Ended.** `markEnd` now: creates the section, **pauses** the player,
+   selects the new section, makes it the active section *without
+   seeking* (so the playhead stays at its end), turns **looping on**, and
+   opens the inline name input with the default name selected. Enter
+   commits (blur), Esc keeps the default (blur). Playing from here runs
+   the loop: the engine sees `currentTime ≥ end` and starts the count-in
+   into the new section.
+
+Engine support: `LoopEngine.arm(section)` — set the active section and
+`looping = true` without seeking or playing (new; `activate` keeps its
+seek-and-play behaviour for jumps).
+
+Auto-focus after END is the **one** place a hotkey leads into a text
+field. It is safe because the video is paused and Enter/Esc return
+focus; the earlier ruling against auto-focus stands everywhere else.
+
 ### 5.8 Notices and errors
 
 Unchanged behaviour; restyled as a slim bar between the video row and
@@ -240,7 +275,9 @@ the transport strip, gold left border for info, red for errors.
 
 ## 6. State and data
 
-- Lesson data: unchanged by this spec (metronome spec adds bpm/countIn).
+- Lesson data: `Section.rate` is **removed** (global, session-only
+  speed). Share URL section field becomes `name,start,end,bpm,beatsPerBar`.
+  The metronome spec's count-in uses the player's current rate.
 - `DEFAULT_RATES`: `[0.25, 0.30, …, 2.00]` (36 values, 0.05 step).
   `snapRate` and `rateStep` work unchanged. Task-2-style check: confirm
   YouTube honours 0.55 and 1.35 (it honoured 0.85/0.9); if some are
@@ -254,7 +291,8 @@ the transport strip, gold left border for info, red for errors.
 
 ## 7. Commands
 
-Added: `setSectionEdge(id, edge, seconds)`. Everything else exists
+Added: `setSectionEdge(id, edge, seconds)`; `markEnd` gains the §5.9
+behaviour; `setRate` no longer persists anything. Everything else exists
 (`markStart/markEnd`, `nudge`, `setRate`, `rateStep`, `toggleLoop`,
 `restartSection`, `togglePlay`, `seekTo`, `renameSection`,
 `deleteSection`, `setFlip`, `stepFrame`, `shareUrl`, `closeLesson`,
@@ -284,13 +322,18 @@ the seconds gap.
 2. **Sections stay ordered by start.** The wireframe's "drag to
    reorder" is dropped; the lane makes order self-evident and `1`–`9`
    stay stable.
-3. **Record/END is one button.** The wireframe shows only END; REC is
-   its idle state.
+3. **MARK/END is one button** (designer's flow, 2026-09-21): MARK while
+   idle and playing, END while recording; END pauses, arms the loop and
+   focuses the name field.
 4. **Speed is continuous in 0.05 steps.** The preset chips survive in
    a popover for quick jumps.
 5. **Renaming is double-click / inline**, no editor panel.
 6. **Zoom is UI-only** and resets to "full" when a lesson opens.
 7. **Tap tempo lives on the TEMPO cell** (plus `T`).
+8. **Speed is global and session-only** (2026-09-21): no `Section.rate`,
+   resets to 1× on open, never in the URL.
+9. **Name field auto-focuses after END** (designer's flow, 2026-09-21),
+   overriding the earlier no-autofocus ruling for this one case.
 
 ## 10. Designer answers (2026-09-20)
 
@@ -309,7 +352,9 @@ the seconds gap.
   range), the new `setSectionEdge` command, `DEFAULT_RATES`
   generation and `rateStep` at 0.05.
 - Browser checklist (Chrome DevTools, as before): record a section
-  with REC/END and see the striped block grow; drag an Out edge with
+  with MARK/END, see the striped block grow with its duration label and
+  the red pinned playhead, then END → paused, loop lit, name field
+  focused with the default selected, Esc keeps it; drag an Out edge with
   snapping; zoom to 20 s and confirm auto-follow; gauge drag and wheel
   change `store.rate`; count-in button cycles; double-click rename;
   narrow layout at 390 px with no horizontal scroll; hotkeys still
