@@ -1,9 +1,9 @@
 # Arrange-view UI — design
 
 Date: 2026-09-20
-Status: approved 2026-09-20 (§9 decisions confirmed, §10 answered);
-amended 2026-09-21 for global speed (§2, §5.5, §6) and the designer's
-"Section Recording Flow" (§5.9). Derived from the Claude Design project
+Status: implemented 2026-09-22 (plan
+docs/superpowers/plans/2026-09-21-arrange-view-ui.md); styling
+provisional. Derived from the Claude Design project
 "Loop Lesson Wireframes" — `Loop Lesson Wireframes.dc.html` (turns 1–3,
 copy in `design/wireframes/`) and `Section Recording Flow.dc.html`
 (three-step MARK → END → name flow). Target: option **3a** (arrange view, LCD speed gauge) on

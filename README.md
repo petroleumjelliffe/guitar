@@ -21,10 +21,12 @@ live in your browser and may be lost when formats change.
 - Tap the lesson's tempo (`T`) and get a one- or two-bar click count-in before each loop restart
 - ±0.1 s nudging of section start and end
 - Frame stepping while paused (`,` / `.`) to watch fingering closely
-- View modes — normal, mirror (`M`), rotate 180° (`R`) — so the
-  instructor's guitar matches your view of your own
+- View modes (normal / mirror / rotate), frame stepping, share and
+  library live in a small overlay on the video
 - Library saved in the browser, plus a shareable link per lesson that
   carries its sections
+- Sections are recorded live: MARK while playing, END to close; then
+  drag or nudge their edges on a zoomable timeline
 
 Coming next (specs in `docs/superpowers/specs/`): a DAW-style arrange
 view; Apple Music as a second source.
@@ -43,13 +45,16 @@ view; Apple Music as a second source.
 | `Alt+←/→` | Nudge section end ∓0.1 s |
 | `,` / `.` | Step one frame (paused) |
 | `-` / `=` | Speed down / up |
-| `[` / `]` | Mark start / mark end |
-| `G` | Cycle silent gap 0 → 1 → 2 → 3 s (used when the lesson has no tempo or count-in is off) |
+| `[` / `]` | Mark section start (playing) / end |
+| `G` | Cycle count-in off → 1 bar → 2 bars |
 | `T` | Tap tempo (one tempo per lesson; tap any time while a video is open) |
 | `M` / `R` | Mirror / rotate 180° (press again for normal) |
 | `Delete` | Delete selected section (undo offered) |
+| `Shift`+wheel over the lane | Zoom |
 
 Hotkeys are ignored while typing in a text field.
+
+The speed dial: drag up/down, scroll, or focus it and use the arrow keys.
 
 ## If a video won't play
 
