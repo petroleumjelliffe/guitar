@@ -39,10 +39,19 @@ describe('sortSections', () => {
   });
 });
 
-describe('snapRate', () => {
-  test('returns the nearest available rate', () => {
+describe('DEFAULT_RATES and snapRate', () => {
+  test('runs from 0.25 to 2 in 0.05 steps with clean decimals', () => {
+    expect(DEFAULT_RATES).toHaveLength(36);
+    expect(DEFAULT_RATES[0]).toBe(0.25);
+    expect(DEFAULT_RATES.at(-1)).toBe(2);
+    expect(DEFAULT_RATES).toContain(0.55);
+    expect(DEFAULT_RATES).toContain(0.85);
+    expect(DEFAULT_RATES).toContain(1.35);
+    for (const r of DEFAULT_RATES) expect(Math.round(r * 100) / 100).toBe(r);
+  });
+  test('snapRate returns the nearest available rate', () => {
     expect(snapRate(0.83, DEFAULT_RATES)).toBe(0.85);
-    expect(snapRate(0.6, DEFAULT_RATES)).toBe(0.5);
+    expect(snapRate(0.62, DEFAULT_RATES)).toBe(0.6);
     expect(snapRate(3, DEFAULT_RATES)).toBe(2);
   });
 });

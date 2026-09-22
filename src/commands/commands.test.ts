@@ -293,7 +293,7 @@ describe('rate commands', () => {
     expect(player.r).toBe(0.95);
     commands.rateStep(1);
     commands.rateStep(1);
-    expect(player.r).toBe(1.25);
+    expect(player.r).toBe(1.05);
     player.r = 2;
     commands.rateStep(1);
     expect(player.r).toBe(2);

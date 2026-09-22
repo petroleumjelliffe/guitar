@@ -25,8 +25,9 @@ export interface Lesson {
 
 export const MIN_SECTION_LENGTH = 0.2;
 
-// Rates the YouTube embed offers. Verified in Task 2 spikes to include intermediate rates.
-export const DEFAULT_RATES = [0.25, 0.5, 0.75, 0.8, 0.85, 0.9, 0.95, 1, 1.25, 1.5, 1.75, 2];
+// 0.25 … 2.00 in 0.05 steps. The embed honours intermediate rates (verified
+// in the spikes) even though it only reports the 8 fixed ones.
+export const DEFAULT_RATES = Array.from({ length: 36 }, (_, i) => Math.round((0.25 + i * 0.05) * 100) / 100);
 
 export function roundTime(t: number): number {
   return Math.round(t * 10) / 10;
