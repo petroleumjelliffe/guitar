@@ -5,6 +5,7 @@ import { LessonPicker } from './LessonPicker';
 import { Notice } from './Notice';
 import { SectionsPanel } from './SectionsPanel';
 import { Stage } from './Stage';
+import { TitleBar } from './TitleBar';
 import { TransportStrip } from './TransportStrip';
 import { resetArrange } from './arrange/store';
 
@@ -22,10 +23,10 @@ export function App() {
   }
   return (
     <main class="app card">
+      <TitleBar />
       <div class="top">
         <div class="video-col">
           <Stage videoId={lesson.videoId} />
-          <div class="caption">{lesson.title}</div>
         </div>
         <SectionsPanel />
       </div>

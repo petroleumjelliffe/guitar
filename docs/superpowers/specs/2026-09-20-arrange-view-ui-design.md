@@ -1,7 +1,7 @@
 # Arrange-view UI — design
 
 Date: 2026-09-20
-Status: implemented 2026-09-22 (plan
+Status: implemented 2026-09-22; title bar + wider video (§3, §5.7, §5.10) added 2026-09-22 (plan
 docs/superpowers/plans/2026-09-21-arrange-view-ui.md); approved
 2026-09-20 (§9 confirmed, §10 answered); amended 2026-09-21 for global
 speed (§2, §5.5, §6) and the designer's "Section Recording Flow"
@@ -52,7 +52,10 @@ sections (sections stay ordered by start time — see §10).
 
 ```
 ┌ card (max 1160, warm grey #d8d5cf, 14 px padding) ───────────────────┐
-│ ┌ video 16:9 (≈48%) ───────┐ ┌ SECTIONS panel (flex 1) ────────────┐ │
+│ [◀ All lessons]  Title — Lesson 3                          [Share]   │ ← title bar (§5.10)
+│                  5 sections · 6:40                                    │
+│ ─────────────────────────────────────────────────────────────────────│
+│ ┌ video 16:9 (≈67%) ──────────────────┐ ┌ SECTIONS (flex 1) ───────┐ │
 │ │                          │ │ header: SECTIONS        [+] [−]      │ │
 │ │                          │ │ ⠿ Section 1   5:09.9 – 5:17.1   ×1  │ │
 │ │                          │ │ ⠿ Section 3 ▌ 5:36.1 – 5:44.3   ×1  │ │ ← selected (gold)
@@ -70,9 +73,11 @@ sections (sections stay ordered by start time — see §10).
 └───────────────────────────────────────────────────────────────────────┘
 ```
 
-The card is centred, max 1160 px, fluid below that. The video column
-is `min(560px, 48%)`; the sections panel takes the rest and matches
-the video's height (its list scrolls). The transport strip is
+The card is centred, max 1160 px, fluid below that. The title bar
+(§5.10) runs full-width above the video row. The video column is
+`min(760px, 67%)` (widened 2026-09-22 from 560/48 %); the sections
+panel takes the rest and matches the video's height (its list
+scrolls). The transport strip is
 full-width.
 
 ### Narrow (< 720 px) — from 1e
@@ -241,13 +246,14 @@ same normalisation, same `updateLesson` path).
 A translucent dark pill (`rgba(20,20,20,.86)`, 5 px radius, as in
 wireframe 1b) anchored to the video's **bottom-right corner**, 8 px
 in, holding small neutral keys: `◀` `▶` (frame step) ·
-`Normal | Mirror | Rotate` · `Share` · `Library`. It sits in the
+`Normal | Mirror | Rotate`. (`Share` and `Library` moved to the title
+bar, §5.10, on 2026-09-22.) It sits in the
 un-transformed layer with the click overlay, so it never mirrors or
 rotates with the video, and clicks on it do not reach the play/pause
 overlay. It is always visible (no hover reveal — hands may be on the
 guitar, and touch has no hover); at narrow widths it collapses to
-icons only. The video title becomes a one-line caption under the
-video; the page header goes away.
+icons only. There is no caption under the video; the title lives in
+the title bar (§5.10).
 
 ### 5.9 Section recording flow (from "Section Recording Flow")
 
@@ -272,6 +278,17 @@ seek-and-play behaviour for jumps).
 Auto-focus after END is the **one** place a hotkey leads into a text
 field. It is safe because the video is paused and Enter/Esc return
 focus; the earlier ruling against auto-focus stands everywhere else.
+
+### 5.10 Title bar (design update 2026-09-22)
+
+A full-width header at the top of the card, separated from the video
+row by a 1 px rule: a light `◀ All lessons` key (= `closeLesson`), the
+lesson title (one line, ellipsised) with a meta line beneath (`5
+sections · 6:40`, duration from the player, omitted until known), and
+a light `Share` key on the right (copies the share URL; reads `Copied`
+for 1.5 s). At narrow widths the keys collapse to icons and the bar
+stays first in the stack. The design's `Save` key is not built: the
+library autosaves.
 
 ### 5.8 Notices and errors
 
