@@ -170,7 +170,10 @@ export function ArrangeLane({ compact = false }: { compact?: boolean }) {
                 commands.jumpToSectionId(s.id);
               }}
               onDblClick={(e) => { e.stopPropagation(); commands.beginRename(s.id); }}
-              onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); commands.jumpToSectionId(s.id); } }}
+              onKeyDown={(e) => {
+                // Activate like a native button: Space must not scroll the page.
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); commands.jumpToSectionId(s.id); }
+              }}
             >
               <span class="block-label">{s.name}</span>
               {!compact && <span class={`handle start${sel && edge === 'start' ? ' grabbed' : ''}`} onPointerDown={(e) => startDrag(e, s.id, 'start')} />}

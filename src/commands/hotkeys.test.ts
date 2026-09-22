@@ -84,4 +84,12 @@ describe('focusSwallows', () => {
   test('role=radio focused by keyboard swallows Space', () => {
     expect(focusSwallows(target({ tagName: 'DIV', role: 'radio', focusVisible: true }), ' ')).toBe(true);
   });
+  test('role=button div and link focused by keyboard swallow Space/Enter, not other keys', () => {
+    const block = target({ tagName: 'DIV', role: 'button', focusVisible: true });
+    expect(focusSwallows(block, ' ')).toBe(true);
+    expect(focusSwallows(block, 'Enter')).toBe(true);
+    expect(focusSwallows(block, 'l')).toBe(false);
+    expect(focusSwallows(target({ tagName: 'A', focusVisible: true }), 'Enter')).toBe(true);
+    expect(focusSwallows(target({ tagName: 'A', focusVisible: false }), 'Enter')).toBe(false);
+  });
 });

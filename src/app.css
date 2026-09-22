@@ -153,6 +153,7 @@ input:focus { outline: 2px solid var(--focus); outline-offset: 1px; }
   .group .keys { height: 44px; }
   .key { height: 44px; min-height: 44px; padding: 0 14px; font-size: 13px; }
   .key.xs, .key.sm { height: 40px; min-height: 40px; }
+  .key.xs { width: 40px; }
   /* .sections-panel prefix (matching .panel-key's real ancestor) beats the
      unconditional .panel-key rule declared later in the "sections panel"
      section, which would otherwise win on source order alone. */

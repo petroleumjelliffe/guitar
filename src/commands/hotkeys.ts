@@ -44,7 +44,6 @@ export interface FocusTarget {
   isContentEditable: boolean;
   focusVisible: boolean;
   role?: string | null;
-  href?: boolean;
 }
 
 const TEXT_INPUT_TYPES = new Set(['text', 'search', 'url', 'email', 'password', 'number', 'tel']);
@@ -97,7 +96,6 @@ export function installHotkeys(commands: Commands, target: Window = window): () 
       isContentEditable: el.isContentEditable,
       focusVisible: el === visibleFocusEl,
       role: el.getAttribute('role'),
-      href: el instanceof HTMLAnchorElement,
     };
     if (focusSwallows(focusTarget, e.key)) return;
     const binding = keyToCommand({
