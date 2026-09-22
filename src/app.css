@@ -205,3 +205,34 @@ button.danger { color: var(--danger); }
 .lcd-cell.tempo .lcd-keys { position: absolute; top: 100%; left: 0; display: none; gap: 3px; padding-top: 4px; }
 .lcd-cell.tempo:hover .lcd-keys, .lcd-cell.tempo:focus-within .lcd-keys { display: flex; }
 .key.meter { width: auto; padding: 0 6px; }
+
+/* --- arrange lane --- */
+.arrange { padding: 8px 14px 12px; min-width: 0; }
+.edit-row { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; flex-wrap: wrap; }
+.segmented { display: flex; border-radius: 4px; overflow: hidden; border: 1px solid var(--key-border); }
+.seg { background: var(--key); color: #b9b6b0; border: none; border-radius: 0; min-height: 22px; height: 22px; padding: 0 9px; font: 500 10px var(--font); }
+.seg + .seg { border-left: 1px solid var(--key-border); }
+.seg.lit { background: var(--gold); color: var(--gold-ink); font-weight: 600; }
+.zoom { width: 104px; height: 20px; min-height: 0; accent-color: #c9c6bf; }
+.ruler { position: relative; height: 16px; border-bottom: 1px solid var(--ruler-line); margin-bottom: 6px; overflow: hidden; }
+.tick { position: absolute; bottom: 0; width: 1px; height: 4px; background: var(--tick-minor); }
+.tick.major { height: 7px; background: var(--tick); }
+.tick label { position: absolute; left: 3px; bottom: 6px; font: 400 8px var(--mono); color: #8b8882; white-space: nowrap; }
+.lane { position: relative; height: 52px; border-radius: 4px; background: var(--lane); box-shadow: 0 1px 3px rgba(0, 0, 0, .5) inset; overflow: hidden; cursor: pointer; touch-action: pan-y; }
+.block { position: absolute; top: 5px; bottom: 5px; border-radius: 4px; background: var(--block); border: 1px solid var(--block-border); color: var(--block-ink); font: 500 10px var(--font); padding: 4px 6px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: pointer; }
+.block.selected { border-color: var(--gold-border); opacity: .85; }
+.block.active { background: var(--gold); border: 1.5px solid var(--gold-border); color: var(--gold-ink); font-weight: 600; box-shadow: var(--gold-glow); }
+.block.recording { background: var(--recording); border: 1.5px dashed var(--recording-border); color: var(--recording-ink); font-weight: 600; }
+.block:focus { outline: 2px solid var(--focus); outline-offset: 1px; }
+.handle { position: absolute; top: 0; bottom: 0; width: 8px; cursor: ew-resize; }
+.handle.start { left: -1px; }
+.handle.end { right: -1px; }
+.handle.grabbed::after { content: ''; position: absolute; top: -3px; bottom: -3px; width: 7px; border-radius: 3px; background: #fff; box-shadow: 0 0 8px rgba(255, 255, 255, .8); }
+.handle.start.grabbed::after { left: 0; }
+.handle.end.grabbed::after { right: 0; }
+.playhead { position: absolute; top: 0; bottom: 0; width: 1.5px; background: var(--playhead); box-shadow: var(--playhead-glow); pointer-events: none; }
+.playhead.rec { background: var(--playhead-rec); box-shadow: var(--playhead-rec-glow); }
+.playhead.paused { background: var(--playhead-paused); box-shadow: none; }
+.arrange.compact { padding: 0; }
+.arrange.compact .lane { height: 22px; }
+.arrange.compact .block { top: 3px; bottom: 3px; padding: 0 4px; font-size: 8px; }
