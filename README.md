@@ -20,8 +20,8 @@ live in your browser and may be lost when formats change.
 - Tap the lesson's tempo (`T`) and get a one- or two-bar click count-in before each loop restart
 - ±0.1 s nudging of section start and end
 - View modes (normal / mirror / rotate) and frame stepping (`,` / `.`,
-  paused) live in a small overlay on the video, alongside share and
-  library
+  paused) live in a small overlay on the video; the title bar above it
+  holds the lesson title, a share link and the way back to the library
 - Library saved in the browser, plus a shareable link per lesson that
   carries its sections
 - Sections are recorded live: MARK while playing, END to close; then
@@ -51,7 +51,9 @@ second source.
 | `Delete` | Delete selected section (undo offered) |
 | `Shift`+wheel over the lane | Zoom |
 
-Hotkeys are ignored while typing in a text field.
+Hotkeys are ignored while typing in a text field. A button you reached
+with Tab keeps `Space`/`Enter` for itself; after a mouse click they go
+straight back to play/pause and restart, so a pedal keeps working.
 
 The speed dial: drag up/down, scroll, or focus it and use the arrow keys.
 
